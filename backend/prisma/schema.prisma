@@ -151,10 +151,18 @@ enum DayOfWeek {
   SATURDAY
 }
 
+enum TeacherStatus {
+  ABSENT
+  BUSY
+  HALF_DAY
+}
+
 model Proxy {
-  id               String   @id @default(uuid())
-  date             DateTime @db.Date
+  id               String        @id @default(uuid())
+  date             DateTime      @db.Date
+  dayOfWeek        Int           // 0-5 for Monday-Saturday
   absentTeacherId  String
+  status           TeacherStatus // ABSENT, BUSY, HALF_DAY
   absenceReason    String?
   periodId         String
   classId          String
@@ -162,8 +170,8 @@ model Proxy {
   assignedTeacherId String
   notes            String?
   createdBy        String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   // Relations
   absentTeacher   Teacher @relation("AbsentTeacher", fields: [absentTeacherId], references: [id])

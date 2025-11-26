@@ -10,7 +10,8 @@ import Classes from './pages/Classes';
 import Subjects from './pages/Subjects';
 import Periods from './pages/Periods';
 import Timetables from './pages/Timetables';
-import ProxyAssignment from './pages/ProxyAssignment';
+import Proxies from './pages/Proxies';
+import Reports from './pages/Reports';
 import Records from './pages/Records';
 
 // Layout
@@ -48,7 +49,8 @@ function AppRoutes() {
         <Route path="subjects" element={<Subjects />} />
         <Route path="periods" element={<Periods />} />
         <Route path="timetables" element={<Timetables />} />
-        <Route path="proxies" element={<ProxyAssignment />} />
+        <Route path="proxies" element={<Proxies />} />
+        <Route path="reports" element={<Reports />} />
         <Route path="records" element={<Records />} />
       </Route>
     </Routes>

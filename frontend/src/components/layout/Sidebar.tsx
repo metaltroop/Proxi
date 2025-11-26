@@ -24,7 +24,7 @@ const Sidebar: React.FC = () => {
         { path: '/periods', label: 'Period Structure', icon: Clock },
         { path: '/timetables', label: 'Timetables', icon: Calendar },
         { path: '/proxies', label: 'Proxies', icon: UserPlus },
-        { path: '/records', label: 'Records', icon: FileText },
+        { path: '/reports', label: 'Reports', icon: FileText },
     ];
 
     return (

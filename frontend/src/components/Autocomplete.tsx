@@ -14,6 +14,7 @@ interface AutocompleteProps {
     placeholder?: string;
     locked?: boolean;
     onUnlock?: () => void;
+    onSearch?: (query: string) => void;
 }
 
 const Autocomplete: React.FC<AutocompleteProps> = ({
@@ -22,7 +23,8 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
     onChange,
     placeholder = 'Search...',
     locked = false,
-    onUnlock
+    onUnlock,
+    onSearch
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -123,8 +125,12 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => {
-                        setSearchQuery(e.target.value);
+                        const newQuery = e.target.value;
+                        setSearchQuery(newQuery);
                         setIsOpen(true);
+                        if (onSearch) {
+                            onSearch(newQuery);
+                        }
                     }}
                     onFocus={() => setIsOpen(true)}
                     placeholder={placeholder}

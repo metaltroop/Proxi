@@ -93,7 +93,7 @@ router.post('/', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR), 
         const teacher = await prisma.teacher.create({
             data: {
                 name,
-                email,
+                email: email || null,
                 phone,
                 employeeId: employeeId || null,
                 isClassTeacher: isClassTeacher || false,
@@ -130,7 +130,7 @@ router.put('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR)
             where: { id: req.params.id },
             data: {
                 name,
-                email,
+                email: email || null,
                 phone,
                 employeeId: employeeId || null,
                 isClassTeacher,

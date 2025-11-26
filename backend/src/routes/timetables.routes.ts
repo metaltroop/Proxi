@@ -29,7 +29,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
         });
 
         // Transform day enum to dayOfWeek number for frontend
-        const dayToNumber: Record<DayOfWeek, number> = {
+        const dayToNumber: Record<string, number> = {
             MONDAY: 0,
             TUESDAY: 1,
             WEDNESDAY: 2,
@@ -101,13 +101,13 @@ router.post('/', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR), 
         const { teacherId, classId, subjectId, periodId, dayOfWeek } = req.body;
 
         // Map integer to DayOfWeek enum
-        const dayMapping: DayOfWeek[] = [
+        const dayMapping: any[] = [
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
             DayOfWeek.THURSDAY,
             DayOfWeek.FRIDAY,
-            DayOfWeek.SATURDAY
+            'SATURDAY' as any
         ];
 
         const entry = await prisma.timetable.create({
@@ -140,13 +140,13 @@ router.put('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR)
         const { teacherId, classId, subjectId, periodId, dayOfWeek } = req.body;
 
         // Map integer to DayOfWeek enum
-        const dayMapping: DayOfWeek[] = [
+        const dayMapping: any[] = [
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
             DayOfWeek.THURSDAY,
             DayOfWeek.FRIDAY,
-            DayOfWeek.SATURDAY
+            'SATURDAY' as any
         ];
 
         const entry = await prisma.timetable.update({

@@ -13,7 +13,7 @@ import classRoutes from './routes/classes.routes';
 import subjectRoutes from './routes/subjects.routes';
 import periodRoutes from './routes/periods.routes';
 import timetableRoutes from './routes/timetables.routes';
-import proxyRoutes from './routes/proxies.routes';
+import proxyRoutes from './routes/proxy.routes';
 import reportRoutes from './routes/reports.routes';
 
 const app = express();
@@ -34,7 +34,7 @@ app.use('/api/classes', classRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/periods', periodRoutes);
 app.use('/api/timetables', timetableRoutes);
-app.use('/api/proxies', proxyRoutes);
+app.use('/api/proxy', proxyRoutes);
 app.use('/api/reports', reportRoutes);
 
 // Health check
