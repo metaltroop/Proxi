@@ -421,12 +421,12 @@ const Timetables: React.FC = () => {
                     <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th className="border border-gray-200 p-3 bg-gray-50 text-left font-semibold text-gray-700 min-w-[100px] rounded-tl-lg">
-                                    Period / Day
+                                <th className="border border-gray-200 p-2 bg-gradient-to-br from-indigo-50 to-blue-50 text-left font-semibold text-gray-800 min-w-[90px] rounded-tl-lg">
+                                    <div className="text-xs">Period / Day</div>
                                 </th>
                                 {DAYS.map((day, idx) => (
-                                    <th key={day} className={`border border-gray-200 p-3 bg-gray-50 text-center font-semibold text-gray-700 min-w-[150px] ${idx === DAYS.length - 1 ? 'rounded-tr-lg' : ''}`}>
-                                        {day}
+                                    <th key={day} className={`border border-gray-200 p-2 bg-gradient-to-br from-indigo-50 to-blue-50 text-center font-semibold text-gray-800 min-w-[110px] ${idx === DAYS.length - 1 ? 'rounded-tr-lg' : ''}`}>
+                                        <div className="text-xs">{day}</div>
                                     </th>
                                 ))}
                             </tr>
@@ -434,9 +434,9 @@ const Timetables: React.FC = () => {
                         <tbody>
                             {periods.map((period, pIdx) => (
                                 <tr key={period.id}>
-                                    <td className={`border border-gray-200 p-3 bg-gray-50 font-medium text-gray-700 ${pIdx === periods.length - 1 ? 'rounded-bl-lg' : ''}`}>
-                                        <div className="text-sm">Period {period.periodNo}</div>
-                                        <div className="text-xs text-gray-500">{period.startTime} - {period.endTime}</div>
+                                    <td className={`border border-gray-200 p-2 bg-gradient-to-r from-purple-50 to-pink-50 font-medium text-gray-800 ${pIdx === periods.length - 1 ? 'rounded-bl-lg' : ''}`}>
+                                        <div className="text-xs font-semibold">P{period.periodNo}</div>
+                                        <div className="text-[10px] text-gray-600">{period.startTime}-{period.endTime}</div>
                                     </td>
                                     {DAYS.map((day, dayIndex) => {
                                         const entry = getTimetableEntry(dayIndex, period.id);
@@ -446,69 +446,69 @@ const Timetables: React.FC = () => {
                                         const isSelected = selectedCells.has(cellKey);
                                         return (
                                             <td key={cellKey}
-                                                className={`border border-gray-200 p-3 transition-all ${pIdx === periods.length - 1 && dayIndex === DAYS.length - 1 ? 'rounded-br-lg' : ''} ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? 'bg-blue-50 border-blue-300' : ''} ${!isSelected && isEditing && !entry && !tempEntry ? 'hover:bg-gray-50' : ''}`}
+                                                className={`border border-gray-200 p-2 transition-all ${pIdx === periods.length - 1 && dayIndex === DAYS.length - 1 ? 'rounded-br-lg' : ''} ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? 'bg-blue-50 border-blue-300' : ''} ${!isSelected && isEditing && !entry && !tempEntry ? 'hover:bg-gray-50' : ''}`}
                                                 onClick={() => handleCellClick(dayIndex, period.id)}>
                                                 {tempEntry ? (
-                                                    <div className="text-center relative group min-h-[60px] flex items-center justify-center">
+                                                    <div className="text-center relative group min-h-[50px] flex items-center justify-center">
                                                         <div>
-                                                            <div className="font-medium text-green-600 text-sm">
+                                                            <div className="font-medium text-green-600 text-xs">
                                                                 {searchType === 'teacher' ? `${getClassDisplay(tempEntry.classId!)}-${getSubjectCode(tempEntry.subjectId)}` : getSubjectCode(tempEntry.subjectId)}
                                                             </div>
-                                                            <div className="text-xs text-green-700 mt-1">
+                                                            <div className="text-[10px] text-green-700 mt-0.5">
                                                                 {searchType === 'teacher' ? getClassDisplay(tempEntry.classId!) : getTeacherName(tempEntry.teacherId!)}
                                                             </div>
                                                         </div>
                                                         {isEditing && (
                                                             <button onClick={(e) => { e.stopPropagation(); handleDeleteTemp(dayIndex, period.id); }}
-                                                                className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600">
-                                                                <X className="w-3 h-3" />
+                                                                className="absolute top-0.5 right-0.5 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600">
+                                                                <X className="w-2.5 h-2.5" />
                                                             </button>
                                                         )}
-                                                        <div className="absolute top-1 left-1">
-                                                            <Check className="w-3 h-3 text-green-600" />
+                                                        <div className="absolute top-0.5 left-0.5">
+                                                            <Check className="w-2.5 h-2.5 text-green-600" />
                                                         </div>
                                                     </div>
                                                 ) : entry && !isPending ? (
-                                                    <div className="text-center relative group min-h-[60px] flex items-center justify-center">
+                                                    <div className="text-center relative group min-h-[50px] flex items-center justify-center">
                                                         <div>
-                                                            <div className="font-medium text-primary-600 text-sm">
+                                                            <div className="font-medium text-primary-600 text-xs">
                                                                 {searchType === 'teacher' ? `${getClassDisplay(entry.classId)}-${getSubjectCode(entry.subjectId)}` : getSubjectCode(entry.subjectId)}
                                                             </div>
-                                                            <div className="text-xs text-gray-600 mt-1">
+                                                            <div className="text-[10px] text-gray-600 mt-0.5">
                                                                 {searchType === 'teacher' ? getClassDisplay(entry.classId) : getTeacherName(entry.teacherId)}
                                                             </div>
                                                         </div>
                                                         {isEditing && entry.id && (
                                                             <button onClick={(e) => { e.stopPropagation(); handleDeleteEntry(entry.id!, dayIndex, period.id); }}
-                                                                className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600">
-                                                                <X className="w-3 h-3" />
+                                                                className="absolute top-0.5 right-0.5 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600">
+                                                                <X className="w-2.5 h-2.5" />
                                                             </button>
                                                         )}
                                                     </div>
                                                 ) : isPending && entry ? (
-                                                    <div className="text-center relative group min-h-[60px] flex items-center justify-center">
+                                                    <div className="text-center relative group min-h-[50px] flex items-center justify-center">
                                                         <div className="opacity-50 line-through">
-                                                            <div className="font-medium text-red-600 text-sm">
+                                                            <div className="font-medium text-red-600 text-xs">
                                                                 {searchType === 'teacher' ? `${getClassDisplay(entry.classId)}-${getSubjectCode(entry.subjectId)}` : getSubjectCode(entry.subjectId)}
                                                             </div>
-                                                            <div className="text-xs text-red-700 mt-1">
+                                                            <div className="text-[10px] text-red-700 mt-0.5">
                                                                 {searchType === 'teacher' ? getClassDisplay(entry.classId) : getTeacherName(entry.teacherId)}
                                                             </div>
                                                         </div>
                                                         {isEditing && (
                                                             <button onClick={(e) => { e.stopPropagation(); handleUndoDelete(dayIndex, period.id); }}
-                                                                className="absolute top-1 right-1 p-1.5 bg-gray-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-gray-600"
+                                                                className="absolute top-0.5 right-0.5 p-1 bg-gray-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-gray-600"
                                                                 title="Undo delete">
-                                                                <X className="w-3 h-3" />
+                                                                <X className="w-2.5 h-2.5" />
                                                             </button>
                                                         )}
-                                                        <div className="absolute top-1 left-1">
-                                                            <X className="w-3 h-3 text-red-600" />
+                                                        <div className="absolute top-0.5 left-0.5">
+                                                            <X className="w-2.5 h-2.5 text-red-600" />
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-center text-gray-400 text-sm min-h-[60px] flex items-center justify-center">
-                                                        {isEditing && isSelected && <Check className="w-4 h-4 mx-auto text-blue-600" />}
+                                                    <div className="text-center text-gray-400 text-xs min-h-[50px] flex items-center justify-center">
+                                                        {isEditing && isSelected && <Check className="w-3 h-3 mx-auto text-blue-600" />}
                                                     </div>
                                                 )}
                                             </td>
