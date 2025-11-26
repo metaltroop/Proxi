@@ -1,0 +1,210 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      UserRole
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  proxiesCreated    Proxy[]         @relation("ProxyCreatedBy")
+  timetablesCreated Timetable[]     @relation("TimetableCreatedBy")
+  absencesMarked    TeacherAbsence[] @relation("AbsenceMarkedBy")
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  COORDINATOR
+  PRINCIPAL
+}
+
+model Teacher {
+  id               String   @id @default(uuid())
+  name             String
+  email            String?  @unique
+  phone            String
+  employeeId       String?  @unique
+  isClassTeacher   Boolean  @default(false)
+  assignedClassId  String?  @unique
+  teachingSubjects Json?    // Array of subject IDs
+  isActive         Boolean  @default(true)
+  joinDate         DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  assignedClass      Class?           @relation("ClassTeacher", fields: [assignedClassId], references: [id])
+  timetables         Timetable[]      @relation("TeacherTimetables")
+  proxiesAsAbsent    Proxy[]          @relation("AbsentTeacher")
+  proxiesAsAssigned  Proxy[]          @relation("AssignedTeacher")
+  absences           TeacherAbsence[]
+
+  @@map("teachers")
+}
+
+model Class {
+  id              String   @id @default(uuid())
+  className       String   @unique // e.g., "1-Rose"
+  standard        Int      // 1-10
+  division        String   // Rose, Marigold, etc.
+  classTeacherId  String?
+  numberOfStudents Int?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  classTeacher Teacher? @relation("ClassTeacher")
+  timetables   Timetable[]
+  proxies      Proxy[]
+
+  @@unique([standard, division])
+  @@map("classes")
+}
+
+model Subject {
+  id                  String   @id @default(uuid())
+  subjectName         String   @unique
+  shortCode           String   @unique
+  colorCode           String?  // Hex color for UI
+  standardsApplicable Json?    // Array of standards [1,2,3...10]
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  timetables Timetable[]
+  proxies    Proxy[]
+
+  @@map("subjects")
+}
+
+model Period {
+  id         String     @id @default(uuid())
+  periodNo   Int        @unique
+  periodType PeriodType
+  startTime  String     // Stored as HH:mm format
+  endTime    String     // Stored as HH:mm format
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Relations
+  timetables Timetable[]
+  proxies    Proxy[]
+
+  @@map("periods")
+}
+
+enum PeriodType {
+  CLASS
+  RECESS
+  LUNCH
+  ASSEMBLY
+  ACTIVITY
+}
+
+model Timetable {
+  id        String   @id @default(uuid())
+  teacherId String
+  classId   String
+  subjectId String
+  day       DayOfWeek
+  periodId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+
+  // Relations
+  teacher Teacher @relation("TeacherTimetables", fields: [teacherId], references: [id], onDelete: Cascade)
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  period  Period  @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  creator User?   @relation("TimetableCreatedBy", fields: [createdBy], references: [id])
+
+  @@unique([teacherId, day, periodId]) // Prevent teacher double-booking
+  @@unique([classId, day, periodId])   // Prevent class double-booking
+  @@map("timetables")
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+model Proxy {
+  id               String   @id @default(uuid())
+  date             DateTime @db.Date
+  absentTeacherId  String
+  absenceReason    String?
+  periodId         String
+  classId          String
+  subjectId        String
+  assignedTeacherId String
+  notes            String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  absentTeacher   Teacher @relation("AbsentTeacher", fields: [absentTeacherId], references: [id])
+  assignedTeacher Teacher @relation("AssignedTeacher", fields: [assignedTeacherId], references: [id])
+  class           Class   @relation(fields: [classId], references: [id])
+  subject         Subject @relation(fields: [subjectId], references: [id])
+  period          Period  @relation(fields: [periodId], references: [id])
+  creator         User    @relation("ProxyCreatedBy", fields: [createdBy], references: [id])
+
+  @@unique([date, periodId, assignedTeacherId]) // Prevent assigning same teacher to multiple classes
+  @@unique([date, periodId, classId])           // Ensure each class has only one proxy per period
+  @@map("proxies")
+}
+
+model TeacherAbsence {
+  id        String   @id @default(uuid())
+  teacherId String
+  date      DateTime @db.Date
+  reason    String?
+  markedBy  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+  marker  User    @relation("AbsenceMarkedBy", fields: [markedBy], references: [id])
+
+  @@unique([teacherId, date])
+  @@map("teacher_absences")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String   // 'create', 'update', 'delete'
+  entityType String   // 'teacher', 'class', 'timetable', 'proxy'
+  entityId   String
+  changes    Json?    // Before and after values
+  timestamp  DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
