@@ -115,7 +115,7 @@ const Teachers: React.FC = () => {
         const errors: { [key: string]: string } = {};
 
         if (!formData.name.trim()) errors.name = 'Name is required';
-        if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        if (formData.email && formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             errors.email = 'Invalid email format';
         }
         if (!formData.phone.trim()) {
@@ -209,7 +209,7 @@ const Teachers: React.FC = () => {
     const filteredTeachers = teachers.filter(teacher => {
         const matchesSearch =
             teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            teacher.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (teacher.email && teacher.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
             teacher.phone.includes(searchQuery);
 
         if (!matchesSearch) return false;
@@ -321,11 +321,11 @@ const Teachers: React.FC = () => {
                         <select
                             value={standardFilter || ''}
                             onChange={(e) => setStandardFilter(e.target.value ? parseInt(e.target.value) : null)}
-                            className="w-48 bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all cursor-pointer hover:border-gray-400"
+                            className="w-48 bg-white border-2 border-primary-300 rounded-lg px-4 py-2.5 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all cursor-pointer hover:border-primary-400"
                         >
-                            <option value="">All Standards</option>
+                            <option value="" className="text-gray-500">All Standards</option>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(std => (
-                                <option key={std} value={std}>Standard {std}</option>
+                                <option key={std} value={std} className="text-gray-900">Standard {std}</option>
                             ))}
                         </select>
                     )}
@@ -334,11 +334,13 @@ const Teachers: React.FC = () => {
                         <select
                             value={subjectFilter || ''}
                             onChange={(e) => setSubjectFilter(e.target.value || null)}
-                            className="w-48 bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all cursor-pointer hover:border-gray-400"
+                            className="w-48 bg-white border-2 border-primary-300 rounded-lg px-4 py-2.5 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all cursor-pointer hover:border-primary-400"
                         >
-                            <option value="">All Subjects</option>
+                            <option value="" className="text-gray-500">All Subjects</option>
                             {subjects.map(subject => (
-                                <option key={subject.id} value={subject.id}>{subject.subjectName}</option>
+                                <option key={subject.id} value={subject.id} className="text-gray-900">
+                                    {subject.subjectName}
+                                </option>
                             ))}
                         </select>
                     )}
@@ -349,7 +351,7 @@ const Teachers: React.FC = () => {
             {viewMode === 'card' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredTeachers.map(teacher => (
-                        <div key={teacher.id} className="card hover:shadow-md transition-shadow">
+                        <div key={teacher.id} className="card interactive">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex-1">
                                     <h3 className="text-lg font-semibold text-gray-900">{teacher.name}</h3>
@@ -555,7 +557,13 @@ const Teachers: React.FC = () => {
                                     <input
                                         type="tel"
                                         value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                                            if (value.length <= 10) {
+                                                setFormData({ ...formData, phone: value });
+                                            }
+                                        }}
+                                        maxLength={10}
                                         className={`input ${formErrors.phone ? 'border-red-500' : ''}`}
                                         placeholder="1234567890"
                                     />
@@ -583,11 +591,21 @@ const Teachers: React.FC = () => {
                                     type="checkbox"
                                     id="isClassTeacher"
                                     checked={formData.isClassTeacher}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        isClassTeacher: e.target.checked,
-                                        assignedClassId: e.target.checked ? formData.assignedClassId : ''
-                                    })}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData,
+                                            isClassTeacher: e.target.checked,
+                                            assignedClassId: e.target.checked ? formData.assignedClassId : ''
+                                        });
+                                        // Clear error when unchecking
+                                        if (!e.target.checked && formErrors.assignedClassId) {
+                                            setFormErrors(prev => {
+                                                const newErrors = { ...prev };
+                                                delete newErrors.assignedClassId;
+                                                return newErrors;
+                                            });
+                                        }
+                                    }}
                                     className="w-4 h-4 text-primary-600 rounded"
                                 />
                                 <label htmlFor="isClassTeacher" className="text-sm font-medium text-gray-700">
@@ -597,7 +615,7 @@ const Teachers: React.FC = () => {
 
                             {/* Assigned Class */}
                             {formData.isClassTeacher && (
-                                <div>
+                                <div className="expand-animation">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Assigned Class <span className="text-red-500">*</span>
                                     </label>
