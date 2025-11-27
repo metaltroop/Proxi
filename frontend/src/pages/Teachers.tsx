@@ -6,7 +6,6 @@ import {
     Plus,
     Edit2,
     Trash2,
-    UserX,
     X,
     Save,
     LayoutGrid,
@@ -57,6 +56,7 @@ const Teachers: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+    const [saving, setSaving] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -126,6 +126,9 @@ const Teachers: React.FC = () => {
         if (formData.isClassTeacher && !formData.assignedClassId) {
             errors.assignedClassId = 'Please select a class';
         }
+        if (formData.teachingSubjects.length === 0) {
+            errors.teachingSubjects = 'Please select at least one teaching subject';
+        }
 
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
@@ -164,6 +167,7 @@ const Teachers: React.FC = () => {
     const handleSaveTeacher = async () => {
         if (!validateForm()) return;
 
+        setSaving(true);
         try {
             if (editingTeacher) {
                 await api.put(`/teachers/${editingTeacher.id}`, formData);
@@ -174,6 +178,8 @@ const Teachers: React.FC = () => {
             fetchTeachers();
         } catch (error: any) {
             alert(error.response?.data?.error || 'Failed to save teacher');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -188,18 +194,7 @@ const Teachers: React.FC = () => {
         }
     };
 
-    const handleToggleAbsence = async (teacher: Teacher) => {
-        try {
-            await api.put(`/teachers/${teacher.id}/absence`, {
-                date: new Date().toISOString().split('T')[0],
-                isAbsent: true,
-                reason: 'Marked absent'
-            });
-            alert(`${teacher.name} marked as absent for today`);
-        } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to mark absence');
-        }
-    };
+
 
     const toggleSubject = (subjectId: string) => {
         setFormData(prev => ({
@@ -395,12 +390,12 @@ const Teachers: React.FC = () => {
 
                             <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
                                 <button
-                                    onClick={() => handleToggleAbsence(teacher)}
+                                    onClick={() => navigate(`/timetables?teacherId=${teacher.id}`)}
                                     className="flex-1 btn btn-secondary flex items-center justify-center gap-2 text-sm"
-                                    title="Mark Absent"
+                                    title="View Timetable"
                                 >
-                                    <UserX className="w-4 h-4" />
-                                    <span>Absent</span>
+                                    <Calendar className="w-4 h-4" />
+                                    <span>Timetable</span>
                                 </button>
                                 <button
                                     onClick={() => handleEditTeacher(teacher)}
@@ -478,13 +473,7 @@ const Teachers: React.FC = () => {
                                             >
                                                 <Calendar className="w-4 h-4" />
                                             </button>
-                                            <button
-                                                onClick={() => handleToggleAbsence(teacher)}
-                                                className="btn btn-secondary p-2 text-xs"
-                                                title="Mark Absent"
-                                            >
-                                                <UserX className="w-4 h-4" />
-                                            </button>
+
                                             <button
                                                 onClick={() => handleEditTeacher(teacher)}
                                                 className="btn btn-secondary p-2"
@@ -629,9 +618,9 @@ const Teachers: React.FC = () => {
                             {/* Teaching Subjects */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Teaching Subjects
+                                    Teaching Subjects <span className="text-red-500">*</span>
                                 </label>
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className={`grid grid-cols-3 gap-2 ${formErrors.teachingSubjects ? 'border-2 border-red-500 rounded-lg p-2' : ''}`}>
                                     {subjects.map(subject => (
                                         <label key={subject.id} className="flex items-center gap-2 p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
                                             <input
@@ -644,6 +633,7 @@ const Teachers: React.FC = () => {
                                         </label>
                                     ))}
                                 </div>
+                                {formErrors.teachingSubjects && <p className="text-red-500 text-xs mt-1">{formErrors.teachingSubjects}</p>}
                             </div>
                         </div>
 
@@ -651,9 +641,9 @@ const Teachers: React.FC = () => {
                             <button onClick={() => setShowModal(false)} className="btn btn-secondary">
                                 Cancel
                             </button>
-                            <button onClick={handleSaveTeacher} className="btn btn-primary flex items-center gap-2">
-                                <Save className="w-4 h-4" />
-                                <span>{editingTeacher ? 'Update' : 'Create'} Teacher</span>
+                            <button onClick={handleSaveTeacher} className="btn btn-primary flex items-center gap-2" disabled={saving}>
+                                <Save className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
+                                <span>{saving ? 'Saving...' : (editingTeacher ? 'Update' : 'Create') + ' Teacher'}</span>
                             </button>
                         </div>
                     </div>

@@ -254,7 +254,7 @@ router.post('/assignments/bulk', async (req: Request, res: Response) => {
                         subjectId,
                         assignedTeacherId: proxyTeacherId,
                         notes: remarks || null,
-                        createdBy: createdBy || 'system',
+                        createdBy: createdBy || 'system', // Now just a string, no FK constraint
                         dayOfWeek: adjustedDay
                     } as any,
                     include: {

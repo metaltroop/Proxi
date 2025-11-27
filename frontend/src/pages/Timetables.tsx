@@ -17,6 +17,7 @@ interface Teacher {
     name: string;
     employeeId: string | null;
     phone?: string;
+    teachingSubjects?: string[];
 }
 
 interface Subject {
@@ -225,17 +226,24 @@ const Timetables: React.FC = () => {
             return;
         }
         try {
-            const deletePromises = pendingDeletions.map(d => api.delete(`/timetables/${d.entryId}`));
-            const createPromises = tempAssignments.map(assignment =>
-                api.post('/timetables', {
-                    classId: assignment.classId,
-                    teacherId: assignment.teacherId,
-                    subjectId: assignment.subjectId,
-                    periodId: assignment.periodId,
-                    dayOfWeek: assignment.day
-                })
-            );
-            await Promise.all([...deletePromises, ...createPromises]);
+            // IMPORTANT: Delete first, then create to avoid unique constraint violations
+            // when moving entries from one day/period to another
+            if (pendingDeletions.length > 0) {
+                await Promise.all(pendingDeletions.map(d => api.delete(`/timetables/${d.entryId}`)));
+            }
+
+            if (tempAssignments.length > 0) {
+                await Promise.all(tempAssignments.map(assignment =>
+                    api.post('/timetables', {
+                        classId: assignment.classId,
+                        teacherId: assignment.teacherId,
+                        subjectId: assignment.subjectId,
+                        periodId: assignment.periodId,
+                        dayOfWeek: assignment.day
+                    })
+                ));
+            }
+
             setTempAssignments([]);
             setPendingDeletions([]);
             setIsEditing(false);
@@ -274,7 +282,18 @@ const Timetables: React.FC = () => {
             sublabel: teacher.employeeId ? `ID: ${teacher.employeeId}` : (teacher.phone || '')
         }));
 
-    const subjectOptions = subjects.map(s => ({ value: s.id, label: `${s.subjectName} (${s.shortCode})` }));
+    // Filter subjects based on selected teacher's teaching subjects when in teacher mode
+    const getFilteredSubjects = () => {
+        if (searchType === 'teacher' && selectedId) {
+            const selectedTeacher = teachers.find(t => t.id === selectedId);
+            if (selectedTeacher?.teachingSubjects && selectedTeacher.teachingSubjects.length > 0) {
+                return subjects.filter(s => selectedTeacher.teachingSubjects!.includes(s.id));
+            }
+        }
+        return subjects;
+    };
+
+    const subjectOptions = getFilteredSubjects().map(s => ({ value: s.id, label: `${s.subjectName} (${s.shortCode})` }));
     const classOptions = classes.map(c => ({ value: c.id, label: c.className }));
     const teacherOptions = teachers.map(t => ({ value: t.id, label: t.name }));
 

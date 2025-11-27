@@ -19,7 +19,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  proxiesCreated    Proxy[]         @relation("ProxyCreatedBy")
   timetablesCreated Timetable[]     @relation("TimetableCreatedBy")
   absencesMarked    TeacherAbsence[] @relation("AbsenceMarkedBy")
   auditLogs         AuditLog[]
@@ -169,7 +168,7 @@ model Proxy {
   subjectId        String
   assignedTeacherId String
   notes            String?
-  createdBy        String
+  createdBy        String?       // Just a string, no foreign key
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
@@ -179,7 +178,7 @@ model Proxy {
   class           Class   @relation(fields: [classId], references: [id])
   subject         Subject @relation(fields: [subjectId], references: [id])
   period          Period  @relation(fields: [periodId], references: [id])
-  creator         User    @relation("ProxyCreatedBy", fields: [createdBy], references: [id])
+  // Removed: creator relation
 
   @@unique([date, periodId, assignedTeacherId]) // Prevent assigning same teacher to multiple classes
   @@unique([date, periodId, classId])           // Ensure each class has only one proxy per period

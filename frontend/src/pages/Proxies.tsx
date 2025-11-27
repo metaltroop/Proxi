@@ -69,6 +69,9 @@ const Proxies: React.FC = () => {
     const [tempAssignments, setTempAssignments] = useState<TempProxyAssignment[]>([]);
     const [existingAssignments, setExistingAssignments] = useState<ExistingProxy[]>([]);
     const [availableTeachersMap, setAvailableTeachersMap] = useState<Record<string, AvailableTeacher[]>>({});
+    const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [loadingPeriods, setLoadingPeriods] = useState<Set<string>>(new Set());
 
     const handleLoadSchedule = async () => {
         if (!selectedTeacherId) return;
@@ -135,6 +138,11 @@ const Proxies: React.FC = () => {
     };
 
     const fetchAvailableTeachers = async (periodId: string) => {
+        setLoadingPeriods(prev => {
+            const next = new Set(prev);
+            next.add(periodId);
+            return next;
+        });
         try {
             const response = await api.get('/proxy/available-teachers', {
                 params: {
@@ -150,6 +158,12 @@ const Proxies: React.FC = () => {
             }));
         } catch (error) {
             console.error('Failed to fetch available teachers:', error);
+        } finally {
+            setLoadingPeriods(prev => {
+                const next = new Set(prev);
+                next.delete(periodId);
+                return next;
+            });
         }
     };
 
@@ -186,12 +200,15 @@ const Proxies: React.FC = () => {
     const handleDeleteExisting = async (proxyId: string) => {
         if (!window.confirm('Are you sure you want to delete this proxy assignment?')) return;
 
+        setDeletingId(proxyId);
         try {
             await api.delete(`/proxy/assignments/${proxyId}`);
             setExistingAssignments(prev => prev.filter(p => p.id !== proxyId));
         } catch (error) {
             console.error('Failed to delete proxy:', error);
             alert('Failed to delete proxy assignment');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -206,6 +223,7 @@ const Proxies: React.FC = () => {
             return;
         }
 
+        setSaving(true);
         try {
             await api.post('/proxy/assignments/bulk', {
                 date: currentDate,
@@ -221,6 +239,8 @@ const Proxies: React.FC = () => {
         } catch (error: any) {
             console.error('Save error:', error);
             alert(error.response?.data?.error || 'Failed to save proxy assignments');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -318,9 +338,13 @@ const Proxies: React.FC = () => {
                     />
 
                     {!isLocked && selectedTeacherId && (
-                        <button onClick={handleLoadSchedule} className="btn btn-primary w-full">
-                            <Calendar className="w-5 h-5 mr-2 inline" />
-                            Load Schedule
+                        <button
+                            onClick={handleLoadSchedule}
+                            className="btn btn-primary w-full flex items-center justify-center gap-2"
+                            disabled={fetchingSchedule}
+                        >
+                            <Calendar className={`w-5 h-5 ${fetchingSchedule ? 'animate-spin' : ''}`} />
+                            {fetchingSchedule ? 'Loading Schedule...' : 'Load Schedule'}
                         </button>
                     )}
                 </div>
@@ -392,15 +416,19 @@ const Proxies: React.FC = () => {
                                 const existingAssignment = getExistingAssignment(entry.periodId);
                                 const availableTeachers = availableTeachersMap[entry.periodId] || [];
 
+                                const isLoading = loadingPeriods.has(entry.periodId);
+
                                 return (
                                     <div
                                         key={entry.periodId}
-                                        className={`card transition-all ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                                            } ${tempAssignment ? 'ring-2 ring-green-500 bg-green-50' : ''} 
-                                              ${existingAssignment ? 'ring-2 ring-purple-500 bg-purple-50' : ''}
-                                              ${teacherStatus ? 'cursor-pointer hover:shadow-lg' : ''
+                                        className={`card transition-all 
+                                            ${isLoading ? 'ring-2 ring-blue-500 animate-pulse bg-blue-50' : ''}
+                                            ${!isLoading && isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
+                                            ${tempAssignment ? 'ring-2 ring-green-500 bg-green-50' : ''} 
+                                            ${existingAssignment ? 'ring-2 ring-purple-500 bg-purple-50' : ''}
+                                            ${teacherStatus ? 'cursor-pointer hover:shadow-lg' : ''
                                             }`}
-                                        onClick={() => teacherStatus && handleCellClick(entry.periodId)}
+                                        onClick={() => teacherStatus && !isLoading && handleCellClick(entry.periodId)}
                                     >
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
@@ -440,8 +468,9 @@ const Proxies: React.FC = () => {
                                                         }}
                                                         className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                                                         title="Delete Proxy"
+                                                        disabled={deletingId === existingAssignment.id}
                                                     >
-                                                        <Trash2 className="w-3 h-3" />
+                                                        <Trash2 className={`w-3 h-3 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
                                                     </button>
                                                 </div>
                                             )}
@@ -462,11 +491,11 @@ const Proxies: React.FC = () => {
                                                 <select
                                                     onClick={(e) => e.stopPropagation()}
                                                     onChange={(e) => handleProxySelect(entry.periodId, e.target.value)}
-                                                    className="w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                                    className="w-full px-4 py-2.5 text-sm bg-white border-2 border-primary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all hover:border-primary-400 cursor-pointer"
                                                 >
-                                                    <option value="">Select teacher...</option>
+                                                    <option value="" className="text-gray-500">Select teacher...</option>
                                                     {availableTeachers.map(teacher => (
-                                                        <option key={teacher.id} value={teacher.id}>
+                                                        <option key={teacher.id} value={teacher.id} className="text-gray-900 py-2">
                                                             {teacher.name} ({teacher.currentLoad} classes)
                                                         </option>
                                                     ))}
@@ -538,8 +567,9 @@ const Proxies: React.FC = () => {
                                                             onClick={() => handleDeleteExisting(existingAssignment.id)}
                                                             className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
                                                             title="Delete Proxy"
+                                                            disabled={deletingId === existingAssignment.id}
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
+                                                            <Trash2 className={`w-4 h-4 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
                                                         </button>
                                                     ) : tempAssignment ? (
                                                         <button
@@ -556,11 +586,11 @@ const Proxies: React.FC = () => {
                                                                     <select
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         onChange={(e) => handleProxySelect(entry.periodId, e.target.value)}
-                                                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary-500 outline-none"
+                                                                        className="w-full px-3 py-2 text-sm bg-white border-2 border-primary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all hover:border-primary-400"
                                                                     >
-                                                                        <option value="">Select teacher...</option>
+                                                                        <option value="" className="text-gray-500">Select teacher...</option>
                                                                         {availableTeachers.map(teacher => (
-                                                                            <option key={teacher.id} value={teacher.id}>
+                                                                            <option key={teacher.id} value={teacher.id} className="text-gray-900">
                                                                                 {teacher.name} ({teacher.currentLoad})
                                                                             </option>
                                                                         ))}
@@ -607,9 +637,9 @@ const Proxies: React.FC = () => {
                             >
                                 Cancel
                             </button>
-                            <button onClick={handleSaveAll} className="btn btn-primary flex items-center gap-2">
-                                <Save className="w-5 h-5" />
-                                Save All ({tempAssignments.length})
+                            <button onClick={handleSaveAll} className="btn btn-primary flex items-center gap-2" disabled={saving}>
+                                <Save className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
+                                {saving ? 'Saving...' : `Save All (${tempAssignments.length})`}
                             </button>
                         </div>
                     </div>
