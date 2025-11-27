@@ -141,7 +141,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
             </div>
 
             {isOpen && filteredOptions.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 origin-top">
                     {filteredOptions.map((option) => (
                         <button
                             key={option.id}

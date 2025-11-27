@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 
 interface DropdownOption {
-    value: string;
+    id: string;
     label: string;
+    sublabel?: string;
 }
 
 interface DropdownProps {
@@ -11,22 +12,18 @@ interface DropdownProps {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
-    label?: string;
-    required?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
     options,
     value,
     onChange,
-    placeholder = 'Select...',
-    label,
-    required = false
+    placeholder = 'Select...'
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    const selectedOption = options.find(opt => opt.value === value);
+    const selectedOption = options.find(opt => opt.id === value);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -39,45 +36,51 @@ const Dropdown: React.FC<DropdownProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelect = (optionValue: string) => {
-        onChange(optionValue);
+    const handleSelect = (optionId: string) => {
+        onChange(optionId);
         setIsOpen(false);
     };
 
     return (
         <div ref={wrapperRef} className="relative">
-            {label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-            )}
-
-            <button
-                type="button"
+            <div
+                className={`flex items-center justify-between w-full px-4 py-3 bg-white border-2 rounded-xl cursor-pointer transition-all
+                ${isOpen ? 'border-primary-500 ring-2 ring-primary-500' : 'border-gray-300 hover:border-primary-400'}`}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 
-                   flex items-center justify-between
-                   hover:border-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 
-                   outline-none transition-all text-left"
             >
-                <span className={selectedOption ? 'text-gray-900' : 'text-gray-400'}>
+                <div className={`flex-1 ${!selectedOption ? 'text-gray-400' : 'text-gray-900'}`}>
                     {selectedOption ? selectedOption.label : placeholder}
-                </span>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </button>
+                </div>
+                <div className="flex items-center gap-2">
+                    {selectedOption && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onChange('');
+                            }}
+                            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                            title="Clear selection"
+                        >
+                            <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                        </button>
+                    )}
+                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
+                </div>
+            </div>
 
             {isOpen && (
-                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 origin-top">
                     {options.map((option) => (
                         <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => handleSelect(option.value)}
-                            className={`w-full text-left px-4 py-3 hover:bg-primary-50 transition-colors 
-                         border-b border-gray-100 last:border-b-0 first:rounded-t-xl last:rounded-b-xl
-                         ${option.value === value ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-900'}`}
+                            key={option.id}
+                            onClick={() => handleSelect(option.id)}
+                            className={`w-full text-left px-4 py-3 transition-colors border-b border-gray-100 last:border-b-0 first:rounded-t-xl last:rounded-b-xl
+                                ${option.id === value ? 'bg-primary-50 text-primary-900' : 'hover:bg-primary-50 text-gray-900'}`}
                         >
-                            {option.label}
+                            <div className="font-medium">{option.label}</div>
+                            {option.sublabel && (
+                                <div className="text-sm text-gray-600 mt-0.5">{option.sublabel}</div>
+                            )}
                         </button>
                     ))}
                     {options.length === 0 && (

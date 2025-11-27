@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import {
-    Search,
-    Plus,
-    Edit2,
-    Trash2,
-    X,
-    Save,
-    LayoutGrid,
-    Table as TableIcon,
-    RefreshCw,
-    Calendar
-} from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, LayoutGrid, Table as TableIcon, RefreshCw, X, Check, Calendar } from 'lucide-react';
+import Dropdown from '../components/Dropdown';
+import { useTheme } from '../context/ThemeContext';
 
 interface Teacher {
     id: string;
@@ -44,6 +35,7 @@ interface Class {
 
 const Teachers: React.FC = () => {
     const navigate = useNavigate();
+    const { isDarkMode } = useTheme();
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [classes, setClasses] = useState<Class[]>([]);
@@ -223,7 +215,7 @@ const Teachers: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="p-8">
+            <div className={`p-8 min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
                 <div className="animate-pulse space-y-4">
                     <div className="h-8 bg-gray-200 rounded w-1/4"></div>
                     <div className="h-64 bg-gray-200 rounded"></div>
@@ -233,132 +225,146 @@ const Teachers: React.FC = () => {
     }
 
     return (
-        <div className="p-8">
+        <div className={`p-4 md:p-8 min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Teachers</h1>
-                    <p className="text-gray-600 mt-1">{filteredTeachers.length} of {teachers.length} teachers</p>
+                    <h1 className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Teachers</h1>
+                    <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{filteredTeachers.length} teachers found</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 self-end md:self-auto">
                     {/* View Toggle */}
-                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                    <div className={`flex items-center rounded-lg p-1 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
                         <button
                             onClick={() => setViewMode('card')}
-                            className={`p-2 rounded ${viewMode === 'card' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+                            className={`p-2 rounded ${viewMode === 'card'
+                                ? (isDarkMode ? 'bg-gray-700 text-white shadow-sm' : 'bg-white text-primary-600 shadow-sm')
+                                : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')}`}
                             title="Card View"
                         >
                             <LayoutGrid className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setViewMode('table')}
-                            className={`p-2 rounded ${viewMode === 'table' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+                            className={`p-2 rounded ${viewMode === 'table'
+                                ? (isDarkMode ? 'bg-gray-700 text-white shadow-sm' : 'bg-white text-primary-600 shadow-sm')
+                                : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')}`}
                             title="Table View"
                         >
                             <TableIcon className="w-5 h-5" />
                         </button>
                     </div>
-                    <button onClick={handleRefresh} className="btn btn-secondary flex items-center gap-2" disabled={loading}>
+                    <button onClick={handleRefresh} className={`btn btn-secondary flex items-center gap-2 ${isDarkMode ? 'bg-gray-800 text-white border-gray-700 hover:bg-gray-700' : ''}`} disabled={loading}>
                         <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-                        <span>Refresh</span>
+                        <span className="hidden md:inline">Refresh</span>
                     </button>
                     <button onClick={handleCreateTeacher} className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-5 h-5" />
-                        <span>Add Teacher</span>
+                        <span className="hidden md:inline">Add Teacher</span>
                     </button>
                 </div>
             </div>
 
             {/* Search and Filters */}
-            <div className="card mb-6">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="flex-1 relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Search by name, email, or phone..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="input pl-10"
-                        />
-                    </div>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                    <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <input
+                        type="text"
+                        placeholder="Search teachers..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className={`w-full pl-10 pr-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-primary-500 outline-none transition-all
+                            ${isDarkMode
+                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-primary-500'
+                                : 'bg-white border-gray-300 text-gray-900 focus:border-primary-500'
+                            }`}
+                    />
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex items-center gap-4 border-b border-gray-200 mb-4">
+                <div className={`flex rounded-lg p-1 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} overflow-x-auto`}>
                     <button
                         onClick={() => { setFilterTab('all'); setStandardFilter(null); setSubjectFilter(null); }}
-                        className={`px-4 py-2 font-medium border-b-2 transition-colors ${filterTab === 'all'
-                            ? 'border-primary-600 text-primary-600'
-                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${filterTab === 'all'
+                            ? (isDarkMode ? 'bg-gray-700 text-white shadow-sm' : 'bg-white text-primary-600 shadow-sm')
+                            : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                     >
                         All Teachers
                     </button>
                     <button
                         onClick={() => { setFilterTab('class'); setSubjectFilter(null); }}
-                        className={`px-4 py-2 font-medium border-b-2 transition-colors ${filterTab === 'class'
-                            ? 'border-primary-600 text-primary-600'
-                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${filterTab === 'class'
+                            ? (isDarkMode ? 'bg-gray-700 text-white shadow-sm' : 'bg-white text-primary-600 shadow-sm')
+                            : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                     >
                         Class Teachers
                     </button>
                     <button
                         onClick={() => { setFilterTab('subject'); setStandardFilter(null); }}
-                        className={`px-4 py-2 font-medium border-b-2 transition-colors ${filterTab === 'subject'
-                            ? 'border-primary-600 text-primary-600'
-                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${filterTab === 'subject'
+                            ? (isDarkMode ? 'bg-gray-700 text-white shadow-sm' : 'bg-white text-primary-600 shadow-sm')
+                            : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                     >
                         Subject Teachers
                     </button>
                 </div>
+            </div>
 
-                {/* Additional Filters */}
-                <div className="flex items-center gap-4">
+            {/* Additional Filters - Stack on mobile */}
+            {(filterTab !== 'all') && (
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
                     {filterTab === 'class' && (
-                        <select
-                            value={standardFilter || ''}
-                            onChange={(e) => setStandardFilter(e.target.value ? parseInt(e.target.value) : null)}
-                            className="w-48 bg-white border-2 border-primary-300 rounded-lg px-4 py-2.5 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all cursor-pointer hover:border-primary-400"
-                        >
-                            <option value="" className="text-gray-500">All Standards</option>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(std => (
-                                <option key={std} value={std} className="text-gray-900">Standard {std}</option>
-                            ))}
-                        </select>
+                        <div className="w-full md:w-64">
+                            <Dropdown
+                                options={[
+                                    { id: '', label: 'All Standards' },
+                                    ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(std => ({
+                                        id: std.toString(),
+                                        label: `Standard ${std}`
+                                    }))
+                                ]}
+                                value={standardFilter?.toString() || ''}
+                                onChange={(value) => setStandardFilter(value ? parseInt(value) : null)}
+                                placeholder="Select Standard"
+                            />
+                        </div>
                     )}
 
                     {filterTab === 'subject' && (
-                        <select
-                            value={subjectFilter || ''}
-                            onChange={(e) => setSubjectFilter(e.target.value || null)}
-                            className="w-48 bg-white border-2 border-primary-300 rounded-lg px-4 py-2.5 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all cursor-pointer hover:border-primary-400"
-                        >
-                            <option value="" className="text-gray-500">All Subjects</option>
-                            {subjects.map(subject => (
-                                <option key={subject.id} value={subject.id} className="text-gray-900">
-                                    {subject.subjectName}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="w-full md:w-64">
+                            <Dropdown
+                                options={[
+                                    { id: '', label: 'All Subjects' },
+                                    ...subjects.map(subject => ({
+                                        id: subject.id,
+                                        label: subject.subjectName
+                                    }))
+                                ]}
+                                value={subjectFilter || ''}
+                                onChange={(value) => setSubjectFilter(value || null)}
+                                placeholder="Select Subject"
+                            />
+                        </div>
                     )}
                 </div>
-            </div>
+            )}
 
             {/* Teachers List - Card View */}
             {viewMode === 'card' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredTeachers.map(teacher => (
-                        <div key={teacher.id} className="card interactive">
+                        <div key={teacher.id} className={`card interactive ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-gray-900">{teacher.name}</h3>
-                                    <p className="text-sm text-gray-600">{teacher.email}</p>
-                                    <p className="text-sm text-gray-600">{teacher.phone}</p>
+                                    <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{teacher.name}</h3>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{teacher.email}</p>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{teacher.phone}</p>
                                     {teacher.employeeId && (
-                                        <p className="text-xs text-gray-500 mt-1">ID: {teacher.employeeId}</p>
+                                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>ID: {teacher.employeeId}</p>
                                     )}
                                 </div>
                                 {teacher.isClassTeacher && (
@@ -368,7 +374,7 @@ const Teachers: React.FC = () => {
 
                             {teacher.assignedClass && (
                                 <div className="mb-3">
-                                    <p className="text-sm font-medium text-gray-700">
+                                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Class: <span className="text-primary-600">{teacher.assignedClass.className}</span>
                                     </p>
                                 </div>
@@ -376,12 +382,12 @@ const Teachers: React.FC = () => {
 
                             {teacher.teachingSubjects && teacher.teachingSubjects.length > 0 && (
                                 <div className="mb-4">
-                                    <p className="text-xs text-gray-500 mb-2">Teaching Subjects:</p>
+                                    <p className={`text-xs mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Teaching Subjects:</p>
                                     <div className="flex flex-wrap gap-1">
                                         {teacher.teachingSubjects.map(subjectId => {
                                             const subject = subjects.find(s => s.id === subjectId);
                                             return subject ? (
-                                                <span key={subjectId} className="badge badge-secondary text-xs">
+                                                <span key={subjectId} className={`badge text-xs ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'badge-secondary'}`}>
                                                     {subject.shortCode}
                                                 </span>
                                             ) : null;
@@ -390,10 +396,10 @@ const Teachers: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
+                            <div className={`flex items-center gap-2 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                 <button
                                     onClick={() => navigate(`/timetables?teacherId=${teacher.id}`)}
-                                    className="flex-1 btn btn-secondary flex items-center justify-center gap-2 text-sm"
+                                    className={`flex-1 btn flex items-center justify-center gap-2 text-sm ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'btn-secondary'}`}
                                     title="View Timetable"
                                 >
                                     <Calendar className="w-4 h-4" />
@@ -401,7 +407,7 @@ const Teachers: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => handleEditTeacher(teacher)}
-                                    className="btn btn-secondary p-2"
+                                    className={`btn p-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'btn-secondary'}`}
                                     title="Edit"
                                 >
                                     <Edit2 className="w-4 h-4" />
@@ -421,34 +427,34 @@ const Teachers: React.FC = () => {
 
             {/* Teachers List - Table View */}
             {viewMode === 'table' && (
-                <div className="card overflow-x-auto">
+                <div className={`card overflow-x-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b border-gray-200">
-                                <th className="text-left p-4 font-semibold text-gray-700">Name</th>
-                                <th className="text-left p-4 font-semibold text-gray-700">Email</th>
-                                <th className="text-left p-4 font-semibold text-gray-700">Phone</th>
-                                <th className="text-left p-4 font-semibold text-gray-700">Employee ID</th>
-                                <th className="text-left p-4 font-semibold text-gray-700">Class</th>
-                                <th className="text-left p-4 font-semibold text-gray-700">Subjects</th>
-                                <th className="text-right p-4 font-semibold text-gray-700">Actions</th>
+                            <tr className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name</th>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email</th>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Phone</th>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Employee ID</th>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Class</th>
+                                <th className={`text-left p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Subjects</th>
+                                <th className={`text-right p-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredTeachers.map(teacher => (
-                                <tr key={teacher.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                <tr key={teacher.id} className={`border-b ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'}`}>
                                     <td className="p-4">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-medium text-gray-900">{teacher.name}</span>
+                                            <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{teacher.name}</span>
                                             {teacher.isClassTeacher && (
                                                 <span className="badge badge-primary text-xs">CT</span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="p-4 text-sm text-gray-600">{teacher.email}</td>
-                                    <td className="p-4 text-sm text-gray-600">{teacher.phone}</td>
-                                    <td className="p-4 text-sm text-gray-600">{teacher.employeeId || '-'}</td>
-                                    <td className="p-4 text-sm text-gray-900">
+                                    <td className={`p-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{teacher.email}</td>
+                                    <td className={`p-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{teacher.phone}</td>
+                                    <td className={`p-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{teacher.employeeId || '-'}</td>
+                                    <td className={`p-4 text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         {teacher.assignedClass?.className || '-'}
                                     </td>
                                     <td className="p-4">
@@ -456,7 +462,7 @@ const Teachers: React.FC = () => {
                                             {teacher.teachingSubjects?.slice(0, 3).map(subjectId => {
                                                 const subject = subjects.find(s => s.id === subjectId);
                                                 return subject ? (
-                                                    <span key={subjectId} className="badge badge-secondary text-xs">
+                                                    <span key={subjectId} className={`badge text-xs ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'badge-secondary'}`}>
                                                         {subject.shortCode}
                                                     </span>
                                                 ) : null;
@@ -470,7 +476,7 @@ const Teachers: React.FC = () => {
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => navigate(`/timetables?teacherId=${teacher.id}`)}
-                                                className="btn btn-secondary p-2 text-xs"
+                                                className={`btn p-2 text-xs ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'btn-secondary'}`}
                                                 title="Create/View Timetable"
                                             >
                                                 <Calendar className="w-4 h-4" />
@@ -478,7 +484,7 @@ const Teachers: React.FC = () => {
 
                                             <button
                                                 onClick={() => handleEditTeacher(teacher)}
-                                                className="btn btn-secondary p-2"
+                                                className={`btn p-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'btn-secondary'}`}
                                                 title="Edit"
                                             >
                                                 <Edit2 className="w-4 h-4" />
@@ -508,9 +514,9 @@ const Teachers: React.FC = () => {
             {/* Create/Edit Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-900">
+                    <div className={`rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 {editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}
                             </h2>
                             <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
@@ -521,14 +527,14 @@ const Teachers: React.FC = () => {
                         <div className="p-6 space-y-4">
                             {/* Name */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className={`input ${formErrors.name ? 'border-red-500' : ''}`}
+                                    className={`input ${formErrors.name ? 'border-red-500' : ''} ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                                     placeholder="John Doe"
                                 />
                                 {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
@@ -537,34 +543,32 @@ const Teachers: React.FC = () => {
                             {/* Email and Phone */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Email
                                     </label>
                                     <input
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className={`input ${formErrors.email ? 'border-red-500' : ''}`}
+                                        className={`input ${formErrors.email ? 'border-red-500' : ''} ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                                         placeholder="john@example.com (optional)"
                                     />
                                     {formErrors.email && <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Phone <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="tel"
                                         value={formData.phone}
-                                        onChange={(e) => {
-                                            const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-                                            if (value.length <= 10) {
-                                                setFormData({ ...formData, phone: value });
-                                            }
-                                        }}
                                         maxLength={10}
-                                        className={`input ${formErrors.phone ? 'border-red-500' : ''}`}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            setFormData({ ...formData, phone: value });
+                                        }}
+                                        className={`input ${formErrors.phone ? 'border-red-500' : ''} ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                                         placeholder="1234567890"
                                     />
                                     {formErrors.phone && <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>}
@@ -573,81 +577,82 @@ const Teachers: React.FC = () => {
 
                             {/* Employee ID */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     Employee ID
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.employeeId}
                                     onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                                    className="input"
-                                    placeholder="EMP001"
+                                    className={`input ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                                    placeholder="EMP001 (optional)"
                                 />
                             </div>
 
-                            {/* Class Teacher Checkbox */}
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    id="isClassTeacher"
-                                    checked={formData.isClassTeacher}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            isClassTeacher: e.target.checked,
-                                            assignedClassId: e.target.checked ? formData.assignedClassId : ''
-                                        });
-                                        // Clear error when unchecking
-                                        if (!e.target.checked && formErrors.assignedClassId) {
-                                            setFormErrors(prev => {
-                                                const newErrors = { ...prev };
+                            {/* Class Teacher Assignment */}
+                            <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <input
+                                        type="checkbox"
+                                        id="isClassTeacher"
+                                        checked={formData.isClassTeacher}
+                                        onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                isClassTeacher: isChecked,
+                                                assignedClassId: isChecked ? prev.assignedClassId : ''
+                                            }));
+                                            if (!isChecked) {
+                                                const newErrors = { ...formErrors };
                                                 delete newErrors.assignedClassId;
-                                                return newErrors;
-                                            });
-                                        }
-                                    }}
-                                    className="w-4 h-4 text-primary-600 rounded"
-                                />
-                                <label htmlFor="isClassTeacher" className="text-sm font-medium text-gray-700">
-                                    Assign as Class Teacher
-                                </label>
-                            </div>
-
-                            {/* Assigned Class */}
-                            {formData.isClassTeacher && (
-                                <div className="expand-animation">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Assigned Class <span className="text-red-500">*</span>
+                                                setFormErrors(newErrors);
+                                            }
+                                        }}
+                                        className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                                    />
+                                    <label htmlFor="isClassTeacher" className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Assign as Class Teacher
                                     </label>
-                                    <select
-                                        value={formData.assignedClassId}
-                                        onChange={(e) => setFormData({ ...formData, assignedClassId: e.target.value })}
-                                        className={`input w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all ${formErrors.assignedClassId ? 'border-red-500' : ''}`}
-                                    >
-                                        <option value="">Select a class</option>
-                                        {classes.map(cls => (
-                                            <option key={cls.id} value={cls.id}>{cls.className}</option>
-                                        ))}
-                                    </select>
-                                    {formErrors.assignedClassId && <p className="text-red-500 text-xs mt-1">{formErrors.assignedClassId}</p>}
                                 </div>
-                            )}
+
+                                <div className={`grid transition-all duration-300 ease-in-out ${formData.isClassTeacher ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                                    <div className="overflow-hidden">
+                                        <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            Assigned Class <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            value={formData.assignedClassId}
+                                            onChange={(e) => setFormData({ ...formData, assignedClassId: e.target.value })}
+                                            className={`input ${formErrors.assignedClassId ? 'border-red-500' : ''} ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                                        >
+                                            <option value="">Select Class</option>
+                                            {classes.map((cls) => (
+                                                <option key={cls.id} value={cls.id}>
+                                                    {cls.className}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {formErrors.assignedClassId && <p className="text-red-500 text-xs mt-1">{formErrors.assignedClassId}</p>}
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Teaching Subjects */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     Teaching Subjects <span className="text-red-500">*</span>
                                 </label>
-                                <div className={`grid grid-cols-3 gap-2 ${formErrors.teachingSubjects ? 'border-2 border-red-500 rounded-lg p-2' : ''}`}>
-                                    {subjects.map(subject => (
-                                        <label key={subject.id} className="flex items-center gap-2 p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
+                                <div className={`border rounded-lg p-4 max-h-48 overflow-y-auto grid grid-cols-2 gap-2 ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}>
+                                    {subjects.map((subject) => (
+                                        <label key={subject.id} className={`flex items-center gap-2 p-2 rounded hover:bg-opacity-50 cursor-pointer ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'}`}>
                                             <input
                                                 type="checkbox"
                                                 checked={formData.teachingSubjects.includes(subject.id)}
                                                 onChange={() => toggleSubject(subject.id)}
-                                                className="w-4 h-4 text-primary-600 rounded"
+                                                className="rounded text-primary-600 focus:ring-primary-500"
                                             />
-                                            <span className="text-sm">{subject.subjectName}</span>
+                                            <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{subject.subjectName}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -655,13 +660,19 @@ const Teachers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200">
-                            <button onClick={() => setShowModal(false)} className="btn btn-secondary">
+                        <div className={`p-6 border-t flex justify-end gap-3 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className={`btn ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'btn-secondary'}`}
+                            >
                                 Cancel
                             </button>
-                            <button onClick={handleSaveTeacher} className="btn btn-primary flex items-center gap-2" disabled={saving}>
-                                <Save className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
-                                <span>{saving ? 'Saving...' : (editingTeacher ? 'Update' : 'Create') + ' Teacher'}</span>
+                            <button
+                                onClick={handleSaveTeacher}
+                                className="btn btn-primary"
+                                disabled={saving}
+                            >
+                                {saving ? 'Saving...' : 'Save Teacher'}
                             </button>
                         </div>
                     </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Plus, Edit2, Trash2, X, Save, Users, Search, RefreshCw, LayoutGrid, Table as TableIcon, Calendar } from 'lucide-react';
+import Autocomplete from '../components/Autocomplete';
 
 interface Class {
     id: string;
@@ -178,12 +179,12 @@ const Classes: React.FC = () => {
     return (
         <div className="p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Classes</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Classes</h1>
                     <p className="text-gray-600 mt-1">{filteredClasses.length} of {classes.length} classes</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                     {/* View Toggle */}
                     <div className="flex items-center bg-gray-100 rounded-lg p-1">
                         <button
@@ -203,11 +204,11 @@ const Classes: React.FC = () => {
                     </div>
                     <button onClick={handleRefresh} className="btn btn-secondary flex items-center gap-2" disabled={loading}>
                         <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-                        <span>Refresh</span>
+                        <span className="hidden sm:inline">Refresh</span>
                     </button>
                     <button onClick={() => setShowBulkModal(true)} className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-5 h-5" />
-                        <span>Bulk Create</span>
+                        <span className="hidden sm:inline">Bulk Create</span>
                     </button>
                 </div>
             </div>
@@ -261,7 +262,7 @@ const Classes: React.FC = () => {
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Standard {standard}</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {groupedClasses[parseInt(standard)].map(cls => (
-                                    <div key={cls.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <div key={cls.id} className="card interactive">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <h3 className="text-lg font-semibold text-gray-900">{cls.className}</h3>
@@ -278,28 +279,30 @@ const Classes: React.FC = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                                        <div className="flex flex-col gap-2 pt-3 border-t border-gray-200">
                                             <button
                                                 onClick={() => navigate(`/timetables?classId=${cls.id}`)}
-                                                className="flex-1 btn btn-secondary flex items-center justify-center gap-2 text-sm"
+                                                className="btn btn-secondary flex items-center justify-center gap-2 text-sm w-full"
                                             >
                                                 <Calendar className="w-4 h-4" />
                                                 <span>Timetable</span>
                                             </button>
-                                            <button
-                                                onClick={() => handleEditClass(cls)}
-                                                className="flex-1 btn btn-secondary flex items-center justify-center gap-2 text-sm"
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                                <span>Edit</span>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteClass(cls.id)}
-                                                className="btn btn-danger p-2"
-                                                title="Delete"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleEditClass(cls)}
+                                                    className="flex-1 btn btn-secondary flex items-center justify-center gap-2 text-sm"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                    <span>Edit</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteClass(cls.id)}
+                                                    className="btn btn-danger p-2"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -494,16 +497,20 @@ const Classes: React.FC = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Class Teacher
                                 </label>
-                                <select
+                                <Autocomplete
+                                    options={[
+                                        { id: '', label: 'No Class Teacher' },
+                                        ...teachers
+                                            .filter(t => !t.isClassTeacher || t.id === editingClass.classTeacherId)
+                                            .map(teacher => ({
+                                                id: teacher.id,
+                                                label: teacher.name
+                                            }))
+                                    ]}
                                     value={editFormData.classTeacherId}
-                                    onChange={(e) => setEditFormData({ ...editFormData, classTeacherId: e.target.value })}
-                                    className="w-full"
-                                >
-                                    <option value="">No Class Teacher</option>
-                                    {teachers.filter(t => !t.isClassTeacher || t.id === editingClass.classTeacherId).map(teacher => (
-                                        <option key={teacher.id} value={teacher.id}>{teacher.name}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setEditFormData({ ...editFormData, classTeacherId: value })}
+                                    placeholder="Search for a teacher..."
+                                />
                             </div>
 
                             {/* Number of Students */}
