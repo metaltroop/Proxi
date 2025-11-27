@@ -20,6 +20,12 @@ export default {
                     900: '#1e3a8a',
                 },
             },
+            padding: {
+                'safe': 'env(safe-area-inset-bottom)',
+                'safe-top': 'env(safe-area-inset-top)',
+                'safe-left': 'env(safe-area-inset-left)',
+                'safe-right': 'env(safe-area-inset-right)',
+            },
         },
     },
     plugins: [],
