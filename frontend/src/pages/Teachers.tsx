@@ -215,10 +215,57 @@ const Teachers: React.FC = () => {
 
     if (loading) {
         return (
-            <div className={`p-8 min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <div className="animate-pulse space-y-4">
-                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-64 bg-gray-200 rounded"></div>
+            <div className={`flex flex-col h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                {/* Sticky Header Skeleton */}
+                <div className={`flex-shrink-0 p-4 md:p-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                    <div className="animate-pulse">
+                        {/* Header skeleton */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div className="flex-1">
+                                <div className={`h-8 rounded w-32 mb-2 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                                <div className={`h-4 rounded w-24 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className={`h-10 w-24 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                                <div className={`h-10 w-24 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                                <div className={`h-10 w-32 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                            </div>
+                        </div>
+
+                        {/* Search and filters skeleton */}
+                        <div className="flex flex-col md:flex-row gap-4 mb-6">
+                            <div className={`flex-1 h-12 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                            <div className={`h-12 w-full md:w-96 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Scrollable Content Skeleton */}
+                <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-24 md:pb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                {/* Name skeleton */}
+                                <div className={`h-6 rounded w-3/4 mb-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                {/* Email skeleton */}
+                                <div className={`h-4 rounded w-1/2 mb-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                {/* Phone skeleton */}
+                                <div className={`h-4 rounded w-1/2 mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                {/* Subjects skeleton */}
+                                <div className="flex gap-2 mb-4">
+                                    <div className={`h-6 rounded w-12 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                    <div className={`h-6 rounded w-12 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                    <div className={`h-6 rounded w-12 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                </div>
+                                {/* Buttons skeleton */}
+                                <div className={`flex gap-2 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                    <div className={`flex-1 h-10 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                    <div className={`h-10 w-10 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                    <div className={`h-10 w-10 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         );

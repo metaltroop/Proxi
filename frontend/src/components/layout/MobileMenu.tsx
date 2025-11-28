@@ -33,7 +33,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             />
 
             {/* Menu Panel */}
-            <div className={`fixed bottom-0 left-0 right-0 z-50 md:hidden rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto transition-transform duration-300 ease-out ${isOpen ? 'translate-y-0' : 'translate-y-full'} ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+            <div
+                className={`fixed bottom-0 left-0 right-0 z-50 md:hidden rounded-t-3xl shadow-2xl overflow-y-auto transition-transform duration-300 ease-out pb-safe ${isOpen ? 'translate-y-0' : 'translate-y-full'} ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+                style={{ maxHeight: 'calc(85vh + env(safe-area-inset-bottom, 20px))' }}
+            >
                 {/* Header */}
                 <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
                     <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>More</h2>
