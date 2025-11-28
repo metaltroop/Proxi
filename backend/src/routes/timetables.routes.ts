@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import prisma from '../config/database';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { UserRole, DayOfWeek } from '@prisma/client';
+import { generateTimetablePdf } from '../services/pdfService';
 
 const router = Router();
 
@@ -47,6 +48,62 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Get timetable error:', error);
         res.status(500).json({ error: 'Failed to get timetable' });
+    }
+});
+
+// Download timetable PDF
+router.get('/download-pdf', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const { classId, teacherId } = req.query;
+
+        if (!classId && !teacherId) {
+            return res.status(400).json({ error: 'Class ID or Teacher ID is required' });
+        }
+
+        const where: any = {};
+        if (classId) where.classId = classId as string;
+        if (teacherId) where.teacherId = teacherId as string;
+
+        const [timetable, periods, classData, teacherData] = await Promise.all([
+            prisma.timetable.findMany({
+                where,
+                include: {
+                    class: true,
+                    teacher: true,
+                    subject: true,
+                    period: true
+                },
+                orderBy: [
+                    { day: 'asc' },
+                    { period: { periodNo: 'asc' } }
+                ]
+            }),
+            prisma.period.findMany({ orderBy: { periodNo: 'asc' } }),
+            classId ? prisma.class.findUnique({ where: { id: classId as string } }) : Promise.resolve(null),
+            teacherId ? prisma.teacher.findUnique({ where: { id: teacherId as string } }) : Promise.resolve(null)
+        ]);
+
+        let name = '';
+        if (classId && classData) {
+            name = `${classData.standard}${classData.division}`;
+        } else if (teacherId && teacherData) {
+            name = teacherData.name;
+        }
+
+        const pdfBuffer = await generateTimetablePdf(
+            timetable as any, // Type assertion needed due to strict typing in service
+            periods,
+            classId ? 'class' : 'teacher',
+            name
+        );
+
+        const formattedName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        res.setHeader('Content-Disposition', `attachment; filename="${formattedName}_timetable.pdf"`);
+        res.send(pdfBuffer);
+
+    } catch (error) {
+        console.error('Generate PDF error:', error);
+        res.status(500).json({ error: 'Failed to generate PDF' });
     }
 });
 

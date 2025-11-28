@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Calendar, Save, X, Plus, Edit, Check, Printer } from 'lucide-react';
+import { Calendar, Save, X, Plus, Edit, Check, Download } from 'lucide-react';
 import Autocomplete from '../components/Autocomplete';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
@@ -303,8 +303,35 @@ const Timetables: React.FC = () => {
     const classOptions = classes.map(c => ({ value: c.id, label: c.className }));
     const teacherOptions = teachers.map(t => ({ value: t.id, label: t.name }));
 
-    const handlePrint = () => {
-        window.print();
+    const handleDownloadPdf = async () => {
+        try {
+            const response = await api.get('/timetables/download-pdf', {
+                params: searchType === 'class'
+                    ? { classId: selectedId }
+                    : { teacherId: selectedId },
+                responseType: 'blob'
+            });
+
+            // Create blob link to download
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const contentDisposition = response.headers['content-disposition'];
+            let fileName = 'timetable.pdf';
+            if (contentDisposition) {
+                const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                if (fileNameMatch.length === 2)
+                    fileName = fileNameMatch[1];
+            }
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download PDF error:', error);
+            alert('Failed to download PDF');
+        }
     };
 
     const getSelectedName = () => {
@@ -330,72 +357,7 @@ const Timetables: React.FC = () => {
 
     return (
         <>
-            {/* Print Styles */}
-            <style>{`
-                @media print {
-                    @page {
-                        size: A4 landscape;
-                        margin: 5mm;
-                    }
-                    
-                    /* Hide everything by default */
-                    body * {
-                        visibility: hidden;
-                    }
-                    
-                    /* Show only the timetable */
-                    #printable-timetable, #printable-timetable * {
-                        visibility: visible;
-                    }
-                    
-                    /* Position the timetable to fill the page */
-                    #printable-timetable {
-                        position: fixed;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: white !important;
-                        z-index: 99999;
-                        padding: 10mm;
-                        margin: 0;
-                    }
-
-                    /* Force Light Theme / White Background */
-                    #printable-timetable table,
-                    #printable-timetable th,
-                    #printable-timetable td,
-                    #printable-timetable div,
-                    #printable-timetable tr {
-                        background-color: white !important;
-                        color: black !important;
-                        border-color: #000 !important;
-                    }
-
-                    /* Ensure borders are visible and crisp */
-                    table {
-                        border-collapse: collapse !important;
-                        width: 100% !important;
-                        border: 2px solid #000 !important;
-                    }
-                    
-                    th, td {
-                        border: 1px solid #000 !important;
-                        padding: 4px !important; /* Reduce padding to fit */
-                    }
-
-                    /* Header styling for print */
-                    h1, p {
-                        color: black !important;
-                        text-align: center;
-                    }
-                    
-                    /* Hide scrollbars */
-                    ::-webkit-scrollbar {
-                        display: none;
-                    }
-                }
-            `}</style>
+            {/* Print Styles Removed - Using Backend PDF Generation */}
 
             <div className={`flex flex-col h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
                 {/* Sticky Header */}
@@ -477,9 +439,9 @@ const Timetables: React.FC = () => {
                                 <div className="flex items-center gap-3 w-full md:w-auto">
                                     {timetableExists && !isEditing && (
                                         <>
-                                            <button onClick={handlePrint} className="btn btn-secondary flex items-center gap-2 flex-1 md:flex-none">
-                                                <Printer className="w-5 h-5" />
-                                                Print
+                                            <button onClick={handleDownloadPdf} className="btn btn-secondary flex items-center gap-2 flex-1 md:flex-none">
+                                                <Download className="w-5 h-5" />
+                                                Download PDF
                                             </button>
                                             <button onClick={() => setIsEditing(true)} className="btn btn-primary flex items-center gap-2 flex-1 md:flex-none">
                                                 <Edit className="w-5 h-5" />
