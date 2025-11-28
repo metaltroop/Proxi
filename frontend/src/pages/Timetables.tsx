@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Calendar, Save, X, Plus, Edit, Check, Download } from 'lucide-react';
+import { Calendar, Save, X, Plus, Edit, Check, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import Autocomplete from '../components/Autocomplete';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
@@ -85,6 +85,8 @@ const Timetables: React.FC = () => {
     const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
     const [tempAssignments, setTempAssignments] = useState<TempAssignment[]>([]);
     const [pendingDeletions, setPendingDeletions] = useState<PendingDeletion[]>([]);
+    const [isSearchExpanded, setIsSearchExpanded] = useState(true);
+    const [isBulkExpanded, setIsBulkExpanded] = useState(false);
 
     // Mobile state
     const [selectedDay, setSelectedDay] = useState(0); // Monday by default
@@ -142,6 +144,7 @@ const Timetables: React.FC = () => {
             console.log('Timetable length:', response.data.timetable.length);
             setTimetable(response.data.timetable);
             setTimetableExists(response.data.timetable.length > 0);
+            setIsSearchExpanded(false); // Auto-collapse search on success
             console.log('timetableExists set to:', response.data.timetable.length > 0);
         } catch (error) {
             console.error('Failed to fetch timetable:', error);
@@ -346,10 +349,37 @@ const Timetables: React.FC = () => {
 
     if (loading) {
         return (
-            <div className={`p-4 md:p-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <div className="animate-pulse space-y-4">
-                    <div className={`h-8 rounded w-1/4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                    <div className={`h-96 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+            <div className={`flex flex-col h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                <div className={`flex-shrink-0 p-4 md:p-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                    {/* Header Skeleton */}
+                    <div className="mb-6 animate-pulse">
+                        <div className={`h-8 rounded w-64 mb-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`h-4 rounded w-48 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                    </div>
+
+                    {/* Search Section Skeleton */}
+                    <div className={`rounded-xl p-6 border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="animate-pulse space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className={`h-4 rounded w-20 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                                <div className={`h-10 rounded-xl w-48 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                            </div>
+                            <div className={`h-12 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                            <div className={`h-10 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Content Area Skeleton */}
+                <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8">
+                    <div className={`rounded-xl p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="animate-pulse space-y-3">
+                            <div className={`h-12 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <div key={i} className={`h-16 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}></div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -367,58 +397,95 @@ const Timetables: React.FC = () => {
                         <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Create and manage class timetables</p>
                     </div>
 
-                    <div className={`rounded-xl p-6 border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Search by:</label>
-                                <div className={`flex items-center rounded-xl p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                    <button onClick={() => !isLocked && setSearchType('class')} disabled={isLocked}
-                                        className={`px-6 py-2 rounded-lg font-medium transition-colors ${searchType === 'class' ? (isDarkMode ? 'bg-gray-600 shadow-sm text-white' : 'bg-white shadow-sm text-primary-600') : (isDarkMode ? 'text-gray-300' : 'text-gray-600')} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}>
-                                        Class
-                                    </button>
-                                    <button onClick={() => !isLocked && setSearchType('teacher')} disabled={isLocked}
-                                        className={`px-6 py-2 rounded-lg font-medium transition-colors ${searchType === 'teacher' ? (isDarkMode ? 'bg-gray-600 shadow-sm text-white' : 'bg-white shadow-sm text-primary-600') : (isDarkMode ? 'text-gray-300' : 'text-gray-600')} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}>
-                                        Teacher
-                                    </button>
-                                </div>
+                    <div className={`rounded-xl border mb-6 transition-all duration-200 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div
+                            className="p-4 flex items-center justify-between cursor-pointer"
+                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        >
+                            <div className="flex items-center gap-2">
+                                <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Search
+                                </h2>
+                                {!isSearchExpanded && selectedId && (
+                                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        - {getSelectedName()}
+                                    </span>
+                                )}
                             </div>
-                            <Autocomplete options={autocompleteOptions} value={selectedId} onChange={setSelectedId}
-                                placeholder={`Search for a ${searchType}...`} locked={isLocked} onUnlock={handleUnlock} onSearch={() => { }} />
-                            {!isLocked && selectedId && (
-                                <button onClick={handleSearch} className="btn btn-primary w-full flex items-center justify-center gap-2">
-                                    <Calendar className="w-5 h-5" />
-                                    Load Timetable
-                                </button>
-                            )}
+                            {isSearchExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                         </div>
+
+                        {isSearchExpanded && (
+                            <div className="p-6 pt-0 space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Search by:</label>
+                                    <div className={`flex items-center rounded-xl p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                        <button onClick={(e) => { e.stopPropagation(); !isLocked && setSearchType('class'); }} disabled={isLocked}
+                                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${searchType === 'class' ? (isDarkMode ? 'bg-gray-600 shadow-sm text-white' : 'bg-white shadow-sm text-primary-600') : (isDarkMode ? 'text-gray-300' : 'text-gray-600')} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}>
+                                            Class
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); !isLocked && setSearchType('teacher'); }} disabled={isLocked}
+                                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${searchType === 'teacher' ? (isDarkMode ? 'bg-gray-600 shadow-sm text-white' : 'bg-white shadow-sm text-primary-600') : (isDarkMode ? 'text-gray-300' : 'text-gray-600')} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}>
+                                            Teacher
+                                        </button>
+                                    </div>
+                                </div>
+                                <Autocomplete options={autocompleteOptions} value={selectedId} onChange={setSelectedId}
+                                    placeholder={`Search for a ${searchType}...`} locked={isLocked} onUnlock={handleUnlock} onSearch={() => { }} />
+                                {!isLocked && selectedId && (
+                                    <button onClick={handleSearch} className="btn btn-primary w-full flex items-center justify-center gap-2">
+                                        <Calendar className="w-5 h-5" />
+                                        Load Timetable
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {isLocked && isEditing && (
-                        <div className={`rounded-xl p-6 border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
-                            <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Bulk Assignment</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <Dropdown options={subjectOptions} value={bulkSubjectId} onChange={setBulkSubjectId}
-                                    placeholder="Select Subject" label="Subject" required />
-                                {searchType === 'teacher' && (
-                                    <Dropdown options={classOptions} value={bulkClassId} onChange={setBulkClassId}
-                                        placeholder="Select Class" label="Class" required />
-                                )}
-                                {searchType === 'class' && (
-                                    <Dropdown options={teacherOptions} value={bulkTeacherId} onChange={setBulkTeacherId}
-                                        placeholder="Select Teacher" label="Teacher" required />
-                                )}
-                                <div className="flex items-end">
-                                    <button onClick={handleAddAssignments} disabled={selectedCells.size === 0}
-                                        className="btn btn-primary w-full flex items-center justify-center gap-2">
-                                        <Plus className="w-5 h-5" />
-                                        Add ({selectedCells.size} cells)
-                                    </button>
+                        <div className={`rounded-xl border mb-6 transition-all duration-200 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div
+                                className="p-4 flex items-center justify-between cursor-pointer"
+                                onClick={() => setIsBulkExpanded(!isBulkExpanded)}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Bulk Assignment</h2>
+                                    {!isBulkExpanded && selectedCells.size > 0 && (
+                                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                                            {selectedCells.size} cells selected
+                                        </span>
+                                    )}
                                 </div>
+                                {isBulkExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                             </div>
-                            {selectedCells.size > 0 && (
-                                <p className={`text-sm mt-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Click cells in the grid to select/deselect them for bulk assignment
-                                </p>
+
+                            {isBulkExpanded && (
+                                <div className="p-6 pt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <Dropdown options={subjectOptions} value={bulkSubjectId} onChange={setBulkSubjectId}
+                                            placeholder="Select Subject" label="Subject" required />
+                                        {searchType === 'teacher' && (
+                                            <Dropdown options={classOptions} value={bulkClassId} onChange={setBulkClassId}
+                                                placeholder="Select Class" label="Class" required />
+                                        )}
+                                        {searchType === 'class' && (
+                                            <Dropdown options={teacherOptions} value={bulkTeacherId} onChange={setBulkTeacherId}
+                                                placeholder="Select Teacher" label="Teacher" required />
+                                        )}
+                                        <div className="flex items-end">
+                                            <button onClick={handleAddAssignments} disabled={selectedCells.size === 0}
+                                                className="btn btn-primary w-full flex items-center justify-center gap-2">
+                                                <Plus className="w-5 h-5" />
+                                                Add ({selectedCells.size} cells)
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {selectedCells.size > 0 && (
+                                        <p className={`text-sm mt-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Click cells in the grid to select/deselect them for bulk assignment
+                                        </p>
+                                    )}
+                                </div>
                             )}
                         </div>
                     )}

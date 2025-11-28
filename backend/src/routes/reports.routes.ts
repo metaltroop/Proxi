@@ -153,4 +153,77 @@ router.get('/stats', async (req: Request, res: Response) => {
     }
 });
 
+// GET /reports/proxies/download-pdf - Download proxy report as PDF
+router.get('/proxies/download-pdf', async (req: Request, res: Response) => {
+    try {
+        const { startDate, endDate, teacherId } = req.query;
+
+        const where: any = {};
+
+        if (startDate && endDate) {
+            where.date = {
+                gte: new Date(startDate as string),
+                lte: new Date(endDate as string)
+            };
+        } else if (startDate) {
+            where.date = {
+                gte: new Date(startDate as string)
+            };
+        } else if (endDate) {
+            where.date = {
+                lte: new Date(endDate as string)
+            };
+        }
+
+        if (teacherId) {
+            where.OR = [
+                { absentTeacherId: teacherId as string },
+                { assignedTeacherId: teacherId as string }
+            ];
+        }
+
+        const proxies = await prisma.proxy.findMany({
+            where,
+            include: {
+                absentTeacher: {
+                    select: { name: true, employeeId: true }
+                },
+                assignedTeacher: {
+                    select: { name: true, employeeId: true }
+                },
+                class: {
+                    select: { className: true, standard: true, division: true }
+                },
+                subject: {
+                    select: { subjectName: true, shortCode: true }
+                },
+                period: {
+                    select: { periodNo: true, startTime: true, endTime: true }
+                }
+            },
+            orderBy: {
+                date: 'desc'
+            }
+        });
+
+        // Generate PDF
+        const { generateProxyReportPdf } = await import('../services/reportsPdfService');
+        const pdfBuffer = await generateProxyReportPdf(
+            proxies as any,
+            startDate as string || new Date().toISOString().split('T')[0],
+            endDate as string || new Date().toISOString().split('T')[0]
+        );
+
+        // Set response headers
+        const filename = `proxy_report_${startDate || 'all'}_to_${endDate || 'all'}.pdf`;
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(pdfBuffer);
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).json({ error: 'Failed to generate PDF report' });
+    }
+});
+
 export default router;

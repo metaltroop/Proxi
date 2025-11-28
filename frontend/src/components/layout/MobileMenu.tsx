@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, User, BookOpen, Calendar, Grid3x3, LogOut, Moon, Sun } from 'lucide-react';
+import { X, User, BookOpen, Calendar, Grid3x3, FileText, LogOut, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -86,6 +86,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                         >
                             <Calendar className="w-6 h-6" />
                             <span className="text-lg font-medium">Periods</span>
+                        </button>
+
+                        <button
+                            onClick={() => handleNavigation('/reports')}
+                            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${isDarkMode ? 'hover:bg-gray-800 text-gray-200' : 'hover:bg-gray-50 text-gray-900'}`}
+                        >
+                            <FileText className="w-6 h-6" />
+                            <span className="text-lg font-medium">Reports</span>
                         </button>
                     </div>
                 </div>
