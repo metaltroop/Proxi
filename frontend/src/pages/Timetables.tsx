@@ -333,27 +333,66 @@ const Timetables: React.FC = () => {
             {/* Print Styles */}
             <style>{`
                 @media print {
+                    @page {
+                        size: A4 landscape;
+                        margin: 5mm;
+                    }
+                    
+                    /* Hide everything by default */
                     body * {
                         visibility: hidden;
                     }
+                    
+                    /* Show only the timetable */
                     #printable-timetable, #printable-timetable * {
                         visibility: visible;
                     }
+                    
+                    /* Position the timetable to fill the page */
                     #printable-timetable {
-                        position: absolute;
+                        position: fixed;
                         left: 0;
                         top: 0;
                         width: 100%;
+                        height: 100%;
+                        background: white !important;
+                        z-index: 99999;
+                        padding: 10mm;
+                        margin: 0;
                     }
-                    @page {
-                        size: A4 landscape;
-                        margin: 10mm;
+
+                    /* Force Light Theme / White Background */
+                    #printable-timetable table,
+                    #printable-timetable th,
+                    #printable-timetable td,
+                    #printable-timetable div,
+                    #printable-timetable tr {
+                        background-color: white !important;
+                        color: black !important;
+                        border-color: #000 !important;
                     }
-                    .no-print {
-                        display: none !important;
-                    }
+
+                    /* Ensure borders are visible and crisp */
                     table {
-                        page-break-inside: avoid;
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                        border: 2px solid #000 !important;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000 !important;
+                        padding: 4px !important; /* Reduce padding to fit */
+                    }
+
+                    /* Header styling for print */
+                    h1, p {
+                        color: black !important;
+                        text-align: center;
+                    }
+                    
+                    /* Hide scrollbars */
+                    ::-webkit-scrollbar {
+                        display: none;
                     }
                 }
             `}</style>
@@ -490,106 +529,128 @@ const Timetables: React.FC = () => {
                     {/* Mobile View - Day Tabs + Period Cards */}
                     {isLocked && !fetchingTimetable && timetableExists && (
                         <>
-                            {/* Mobile View */}
-                            <div className="md:hidden">
-                                {/* Day Tabs */}
-                                <div className={`flex overflow-x-auto gap-2 mb-4 pb-2 no-print ${isDarkMode ? 'scrollbar-dark' : 'scrollbar-light'}`}>
-                                    {DAYS.map((day, idx) => (
-                                        <button
-                                            key={day}
-                                            onClick={() => setSelectedDay(idx)}
-                                            className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all ${selectedDay === idx
-                                                ? (isDarkMode ? 'bg-primary-600 text-white shadow-lg' : 'bg-primary-600 text-white shadow-lg')
-                                                : (isDarkMode ? 'bg-gray-800 text-gray-300 border border-gray-700' : 'bg-white text-gray-700 border border-gray-200')
-                                                }`}
-                                        >
-                                            {day}
-                                        </button>
-                                    ))}
+                            {/* Mobile View - 3 Day Range */}
+                            <div className="md:hidden no-print">
+                                {/* Navigation Header */}
+                                <div className="flex items-center justify-between mb-4 bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                    <button
+                                        onClick={() => setSelectedDay(Math.max(0, selectedDay - 3))}
+                                        disabled={selectedDay === 0}
+                                        className={`p-2 rounded-lg transition-colors ${selectedDay === 0
+                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                            : 'text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-1 font-medium">
+                                            <span>←</span>
+                                            <span>Mon-Wed</span>
+                                        </div>
+                                    </button>
+
+                                    <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+                                    <button
+                                        onClick={() => setSelectedDay(Math.min(3, selectedDay + 3))}
+                                        disabled={selectedDay >= 3}
+                                        className={`p-2 rounded-lg transition-colors ${selectedDay >= 3
+                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                            : 'text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-1 font-medium">
+                                            <span>Thu-Sat</span>
+                                            <span>→</span>
+                                        </div>
+                                    </button>
                                 </div>
 
-                                {/* Period Cards for Selected Day */}
-                                <div className="space-y-3">
-                                    {periods.map(period => {
-                                        const entry = getTimetableEntry(selectedDay, period.id);
-                                        const tempEntry = getTempAssignment(selectedDay, period.id);
-                                        const isPending = isPendingDeletion(selectedDay, period.id);
-                                        const cellKey = getCellKey(selectedDay, period.id);
-                                        const isSelected = selectedCells.has(cellKey);
+                                {/* 3-Day Grid */}
+                                <div className={`rounded-xl overflow-hidden border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full border-collapse">
+                                            <thead>
+                                                <tr>
+                                                    <th className={`border p-2 text-left font-semibold min-w-[60px] ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                                                        <div className="text-[10px] uppercase tracking-wider">Time</div>
+                                                    </th>
+                                                    {DAYS.slice(Math.floor(selectedDay / 3) * 3, Math.floor(selectedDay / 3) * 3 + 3).map(day => (
+                                                        <th key={day} className={`border p-2 text-center font-semibold min-w-[100px] ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                                                            <div className="text-xs">{day.slice(0, 3)}</div>
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {periods.map(period => (
+                                                    <tr key={period.id}>
+                                                        <td className={`border p-2 font-medium ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                                                            <div className="text-xs font-bold">P{period.periodNo}</div>
+                                                            <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{period.startTime}</div>
+                                                            <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{period.endTime}</div>
+                                                        </td>
+                                                        {DAYS.slice(Math.floor(selectedDay / 3) * 3, Math.floor(selectedDay / 3) * 3 + 3).map((_, idx) => {
+                                                            const actualDayIndex = Math.floor(selectedDay / 3) * 3 + idx;
+                                                            const entry = getTimetableEntry(actualDayIndex, period.id);
+                                                            const tempEntry = getTempAssignment(actualDayIndex, period.id);
+                                                            const isPending = isPendingDeletion(actualDayIndex, period.id);
+                                                            const cellKey = getCellKey(actualDayIndex, period.id);
+                                                            const isSelected = selectedCells.has(cellKey);
 
-                                        return (
-                                            <div
-                                                key={period.id}
-                                                onClick={() => handleCellClick(selectedDay, period.id)}
-                                                className={`rounded-xl p-4 border transition-all ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                                                    } ${isEditing && !entry && !tempEntry ? 'cursor-pointer active:scale-98' : ''} ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
-                                            >
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <div>
-                                                        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            Period {period.periodNo}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                            {period.startTime} - {period.endTime}
-                                                        </div>
-                                                    </div>
-                                                    {isSelected && (
-                                                        <Check className="w-5 h-5 text-blue-600" />
-                                                    )}
-                                                </div>
-
-                                                {tempEntry ? (
-                                                    <div className="space-y-1">
-                                                        <div className="font-medium text-green-600 text-sm">
-                                                            {searchType === 'teacher' ? `${getClassDisplay(tempEntry.classId!)}-${getSubjectCode(tempEntry.subjectId)}` : getSubjectName(tempEntry.subjectId)}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                            {searchType === 'teacher' ? getClassDisplay(tempEntry.classId!) : getTeacherName(tempEntry.teacherId!)}
-                                                        </div>
-                                                        {isEditing && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleDeleteTemp(selectedDay, period.id); }}
-                                                                className="mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
-                                                            >
-                                                                Remove
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                ) : entry && !isPending ? (
-                                                    <div className="space-y-1">
-                                                        <div className="font-medium text-primary-600 text-sm">
-                                                            {searchType === 'teacher' ? `${getClassDisplay(entry.classId)}-${getSubjectCode(entry.subjectId)}` : getSubjectName(entry.subjectId)}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                            {searchType === 'teacher' ? getClassDisplay(entry.classId) : getTeacherName(entry.teacherId)}
-                                                        </div>
-                                                        {isEditing && entry.id && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleDeleteEntry(entry.id!, selectedDay, period.id); }}
-                                                                className="mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
-                                                            >
-                                                                Delete
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                ) : isPending ? (
-                                                    <div className="space-y-1">
-                                                        <div className="text-sm text-red-600 font-medium">Marked for deletion</div>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleUndoDelete(selectedDay, period.id); }}
-                                                            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                                        >
-                                                            Undo
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                                        {isEditing ? 'Tap to select' : 'Free period'}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                            return (
+                                                                <td key={cellKey}
+                                                                    className={`border p-1 transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? (isDarkMode ? 'bg-blue-900/50 border-blue-600' : 'bg-blue-50 border-blue-300') : ''}`}
+                                                                    onClick={() => handleCellClick(actualDayIndex, period.id)}>
+                                                                    {tempEntry ? (
+                                                                        <div className="text-center min-h-[60px] flex flex-col items-center justify-center p-1 relative">
+                                                                            <div className="font-bold text-green-600 text-xs break-words w-full">
+                                                                                {searchType === 'teacher' ? `${getClassDisplay(tempEntry.classId!)}-${getSubjectCode(tempEntry.subjectId)}` : getSubjectCode(tempEntry.subjectId)}
+                                                                            </div>
+                                                                            <div className="text-[10px] text-green-700 mt-0.5 truncate w-full">
+                                                                                {searchType === 'teacher' ? getClassDisplay(tempEntry.classId!) : getTeacherName(tempEntry.teacherId!)}
+                                                                            </div>
+                                                                            {isEditing && (
+                                                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteTemp(actualDayIndex, period.id); }}
+                                                                                    className="absolute -top-1 -right-1 p-0.5 bg-red-500 text-white rounded-full shadow-sm">
+                                                                                    <X className="w-3 h-3" />
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    ) : entry && !isPending ? (
+                                                                        <div className="text-center min-h-[60px] flex flex-col items-center justify-center p-1 relative">
+                                                                            <div className={`font-bold text-xs break-words w-full ${isDarkMode ? 'text-primary-400' : 'text-primary-700'}`}>
+                                                                                {searchType === 'teacher' ? `${getClassDisplay(entry.classId)}-${getSubjectCode(entry.subjectId)}` : getSubjectCode(entry.subjectId)}
+                                                                            </div>
+                                                                            <div className={`text-[10px] mt-0.5 truncate w-full ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                                {searchType === 'teacher' ? getClassDisplay(entry.classId) : getTeacherName(entry.teacherId)}
+                                                                            </div>
+                                                                            {isEditing && entry.id && (
+                                                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteEntry(entry.id!, actualDayIndex, period.id); }}
+                                                                                    className="absolute -top-1 -right-1 p-0.5 bg-red-500 text-white rounded-full shadow-sm">
+                                                                                    <X className="w-3 h-3" />
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    ) : isPending ? (
+                                                                        <div className="text-center min-h-[60px] flex flex-col items-center justify-center relative">
+                                                                            <div className="text-[10px] text-red-500 font-medium">Del</div>
+                                                                            <button onClick={(e) => { e.stopPropagation(); handleUndoDelete(actualDayIndex, period.id); }}
+                                                                                className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-800/80 text-blue-600">
+                                                                                <Check className="w-4 h-4" />
+                                                                            </button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className={`text-center min-h-[60px] flex items-center justify-center text-[10px] ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>
+                                                                            -
+                                                                        </div>
+                                                                    )}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
 
