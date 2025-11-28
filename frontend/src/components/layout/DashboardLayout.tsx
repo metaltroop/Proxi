@@ -3,9 +3,13 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 
+import { useTheme } from '../../context/ThemeContext';
+
 const DashboardLayout: React.FC = () => {
+    const { isDarkMode } = useTheme();
+
     return (
-        <div className="flex h-screen bg-gray-50 print:bg-white print:h-auto">
+        <div className={`flex h-screen print:h-auto ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50 print:bg-white'}`}>
             {/* Sidebar - Hidden on mobile */}
             <div className="h-full flex-none hidden md:flex print:hidden">
                 <Sidebar />
