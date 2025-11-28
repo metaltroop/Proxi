@@ -23,6 +23,10 @@ model User {
   absencesMarked    TeacherAbsence[] @relation("AbsenceMarkedBy")
   auditLogs         AuditLog[]
 
+  // Auth
+  resetPasswordOtp     String?
+  resetPasswordExpires DateTime?
+
   @@map("users")
 }
 

@@ -415,7 +415,7 @@ const Timetables: React.FC = () => {
                             {isSearchExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                         </div>
 
-                        {isSearchExpanded && (
+                        <div className={`overflow-hidden transition-all duration-300 ease-ios ${isSearchExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                             <div className="p-6 pt-0 space-y-4">
                                 <div className="flex items-center gap-4">
                                     <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Search by:</label>
@@ -439,7 +439,7 @@ const Timetables: React.FC = () => {
                                     </button>
                                 )}
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     {isLocked && isEditing && (
@@ -459,7 +459,7 @@ const Timetables: React.FC = () => {
                                 {isBulkExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                             </div>
 
-                            {isBulkExpanded && (
+                            <div className={`overflow-hidden transition-all duration-300 ease-ios ${isBulkExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 <div className="p-6 pt-0">
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <Dropdown options={subjectOptions} value={bulkSubjectId} onChange={setBulkSubjectId}
@@ -486,7 +486,7 @@ const Timetables: React.FC = () => {
                                         </p>
                                     )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     )}
 
