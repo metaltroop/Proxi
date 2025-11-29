@@ -15,6 +15,7 @@ import periodRoutes from './routes/periods.routes';
 import timetableRoutes from './routes/timetables.routes';
 import proxyRoutes from './routes/proxy.routes';
 import reportRoutes from './routes/reports.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ app.use('/api/periods', periodRoutes);
 app.use('/api/timetables', timetableRoutes);
 app.use('/api/proxy', proxyRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

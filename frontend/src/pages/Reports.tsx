@@ -108,8 +108,8 @@ const Reports: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('overview')}
                         className={`flex-1 md:flex-none px-6 py-2 rounded-lg font-medium transition-colors ${activeTab === 'overview'
-                                ? (isDarkMode ? 'bg-primary-600 text-white shadow-md' : 'bg-primary-600 text-white shadow-md')
-                                : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50')
+                            ? (isDarkMode ? 'bg-primary-600 text-white shadow-md' : 'bg-primary-600 text-white shadow-md')
+                            : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50')
                             }`}
                     >
                         Overview
@@ -117,8 +117,8 @@ const Reports: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('proxy')}
                         className={`flex-1 md:flex-none px-6 py-2 rounded-lg font-medium transition-colors ${activeTab === 'proxy'
-                                ? (isDarkMode ? 'bg-primary-600 text-white shadow-md' : 'bg-primary-600 text-white shadow-md')
-                                : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50')
+                            ? (isDarkMode ? 'bg-primary-600 text-white shadow-md' : 'bg-primary-600 text-white shadow-md')
+                            : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50')
                             }`}
                     >
                         Proxy History
@@ -352,8 +352,8 @@ const Reports: React.FC = () => {
                                                     </td>
                                                     <td className="p-3 text-sm">
                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${report.status === 'ABSENT' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
-                                                                report.status === 'BUSY' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
-                                                                    'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
+                                                            report.status === 'BUSY' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                                'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
                                                             }`}>
                                                             {report.status}
                                                         </span>
@@ -395,8 +395,8 @@ const Reports: React.FC = () => {
                                                 </p>
                                             </div>
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${report.status === 'ABSENT' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
-                                                    report.status === 'BUSY' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
-                                                        'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
+                                                report.status === 'BUSY' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                    'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
                                                 }`}>
                                                 {report.status}
                                             </span>

@@ -542,6 +542,44 @@ const Timetables: React.FC = () => {
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8">
+                    {/* Empty State - No Search Performed */}
+                    {!isLocked && (
+                        <div className={`rounded-xl p-12 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex flex-col items-center justify-center text-center space-y-6">
+                                {/* Animated Icon */}
+                                <div className="relative">
+                                    <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 ${isDarkMode ? 'bg-primary-500' : 'bg-primary-300'} animate-pulse`}></div>
+                                    <div className={`relative w-24 h-24 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                        <Calendar className={`w-12 h-12 ${isDarkMode ? 'text-primary-400' : 'text-primary-600'} animate-bounce`} style={{ animationDuration: '2s' }} />
+                                    </div>
+                                </div>
+
+                                {/* Text Content */}
+                                <div className="space-y-2">
+                                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        No Timetable Selected
+                                    </h3>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} max-w-md`}>
+                                        Search for a class or teacher above to view and manage their timetable
+                                    </p>
+                                </div>
+
+                                {/* Floating Elements */}
+                                <div className="flex gap-4 mt-4">
+                                    <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'} animate-pulse`} style={{ animationDelay: '0s', animationDuration: '3s' }}>
+                                        <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>📚 Classes</span>
+                                    </div>
+                                    <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'} animate-pulse`} style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                                        <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>👨‍🏫 Teachers</span>
+                                    </div>
+                                    <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'} animate-pulse`} style={{ animationDelay: '2s', animationDuration: '3s' }}>
+                                        <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>⏰ Periods</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {isLocked && fetchingTimetable && (
                         <div className={`rounded-xl p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             <div className="animate-pulse space-y-3">
