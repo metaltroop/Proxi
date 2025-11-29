@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Calendar, Save, X, Check, LayoutGrid, Table as TableIcon, Trash2 } from 'lucide-react';
+import { Calendar, Save, X, Check, LayoutGrid, Table as TableIcon, Trash2, UserPlus } from 'lucide-react';
 import Autocomplete from '../components/Autocomplete';
 import { useTheme } from '../context/ThemeContext';
 
@@ -366,6 +366,99 @@ const Proxies: React.FC = () => {
                                 onClick={handleLoadSchedule}
                                 className="btn btn-primary w-full flex items-center justify-center gap-2"
                                 disabled={fetchingSchedule}
+                            >
+                                <Calendar className={`w-5 h-5 ${fetchingSchedule ? 'animate-spin' : ''}`} />
+                                {fetchingSchedule ? 'Loading Schedule...' : 'Load Schedule'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-24 md:pb-8">
+                {/* Empty State - No Teacher Selected */}
+                {!isLocked && (
+                    <div className={`rounded-xl p-12 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className="flex flex-col items-center justify-center text-center space-y-6">
+                            {/* Animated Icon */}
+                            <div className="relative">
+                                <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 ${isDarkMode ? 'bg-primary-500' : 'bg-primary-300'} animate-pulse`}></div>
+                                <div className={`relative w-24 h-24 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                    <UserPlus className={`w-12 h-12 ${isDarkMode ? 'text-primary-400' : 'text-primary-600'} animate-bounce`} style={{ animationDuration: '2s' }} />
+                                </div>
+                            </div>
+
+                            {/* Text Content */}
+                            <div className="space-y-2">
+                                <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    No Teacher Selected
+                                </h3>
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} max-w-md`}>
+                                    Search for a teacher above to view their schedule and assign proxies
+                                </p>
+                            </div>
+
+                            {/* Floating Status Badges */}
+                            <div className="flex gap-4 mt-4 flex-wrap justify-center">
+                                <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-red-900/20 border border-red-800' : 'bg-red-50 border border-red-200'} animate-pulse`} style={{ animationDelay: '0s', animationDuration: '3s' }}>
+                                    <span className={`text-xs font-medium ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>🔴 Absent</span>
+                                </div>
+                                <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-yellow-900/20 border border-yellow-800' : 'bg-yellow-50 border border-yellow-200'} animate-pulse`} style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                                    <span className={`text-xs font-medium ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>🟡 Busy</span>
+                                </div>
+                                <div className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-orange-900/20 border border-orange-800' : 'bg-orange-50 border border-orange-200'} animate-pulse`} style={{ animationDelay: '2s', animationDuration: '3s' }}>
+                                    <span className={`text-xs font-medium ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>🟠 Half Day</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Teacher Status Selection */}
+                {isLocked && !fetchingSchedule && teacherSchedule.length > 0 && (
+                    <div className={`rounded-xl p-6 border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Teacher Status</h2>
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <button
+                                onClick={() => handleStatusSelect('ABSENT')}
+                                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${teacherStatus === 'ABSENT'
+                                    ? 'bg-red-500 text-white shadow-lg'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                                    }`}
+                            >
+                                🔴 Mark as Absent
+                            </button>
+                            <button
+                                onClick={() => handleStatusSelect('BUSY')}
+                                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${teacherStatus === 'BUSY'
+                                    ? 'bg-yellow-500 text-white shadow-lg'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                                    }`}
+                            >
+                                🟡 Mark as Busy (School Work)
+                            </button>
+                            <button
+                                onClick={() => handleStatusSelect('HALF_DAY')}
+                                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${teacherStatus === 'HALF_DAY'
+                                    ? 'bg-orange-500 text-white shadow-lg'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                                    }`}
+                            >
+                                🟠 Mark as Half Day
+                            </button>
+                        </div>
+                        {teacherStatus && (
+                            <p className={`text-sm mt-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Click on periods below to select them for proxy assignment
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {isLocked && fetchingSchedule && (
+                    <div className={`rounded-xl p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div className="animate-pulse space-y-3">
                             <div className={`h-6 rounded w-1/4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -377,24 +470,24 @@ const Proxies: React.FC = () => {
                     </div>
                 )}
 
-                    {/* Teacher Schedule Grid/Table */}
-                    {isLocked && !fetchingSchedule && teacherSchedule.length > 0 && (
-                        <>
-                            {viewMode === 'grid' ? (
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                                    {teacherSchedule.map(entry => {
-                                        const isSelected = selectedCells.has(entry.periodId);
-                                        const tempAssignment = getTempAssignment(entry.periodId);
-                                        const existingAssignment = getExistingAssignment(entry.periodId);
-                                        const availableTeachers = availableTeachersMap[entry.periodId] || [];
+                {/* Teacher Schedule Grid/Table */}
+                {isLocked && !fetchingSchedule && teacherSchedule.length > 0 && (
+                    <>
+                        {viewMode === 'grid' ? (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                                {teacherSchedule.map(entry => {
+                                    const isSelected = selectedCells.has(entry.periodId);
+                                    const tempAssignment = getTempAssignment(entry.periodId);
+                                    const existingAssignment = getExistingAssignment(entry.periodId);
+                                    const availableTeachers = availableTeachersMap[entry.periodId] || [];
 
-                                        const isLoading = loadingPeriods.has(entry.periodId);
-                                        const hasPassed = isPeriodPast(entry.endTime);
+                                    const isLoading = loadingPeriods.has(entry.periodId);
+                                    const hasPassed = isPeriodPast(entry.endTime);
 
-                                        return (
-                                            <div
-                                                key={entry.periodId}
-                                                className={`rounded-xl p-4 border transition-all 
+                                    return (
+                                        <div
+                                            key={entry.periodId}
+                                            className={`rounded-xl p-4 border transition-all 
                                             ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}
                                             ${hasPassed ? 'opacity-50 cursor-not-allowed' : ''}
                                             ${isLoading ? 'ring-2 ring-blue-500 animate-pulse' : ''}
@@ -402,250 +495,250 @@ const Proxies: React.FC = () => {
                                             ${tempAssignment ? 'ring-2 ring-green-500' : ''} 
                                             ${existingAssignment ? 'ring-2 ring-purple-500' : ''}
                                             ${teacherStatus && !hasPassed ? 'cursor-pointer hover:shadow-lg' : ''
-                                                    }`}
-                                                onClick={() => !hasPassed && teacherStatus && !isLoading && handleCellClick(entry.periodId)}
-                                            >
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                                                            Period {entry.periodNo}
-                                                            {hasPassed && (
-                                                                <span className="ml-2 text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">PAST</span>
-                                                            )}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                            {entry.startTime} - {entry.endTime}
-                                                        </div>
+                                                }`}
+                                            onClick={() => !hasPassed && teacherStatus && !isLoading && handleCellClick(entry.periodId)}
+                                        >
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                                        Period {entry.periodNo}
+                                                        {hasPassed && (
+                                                            <span className="ml-2 text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">PAST</span>
+                                                        )}
                                                     </div>
-
-                                                    {/* Status Icons */}
-                                                    {isSelected && !tempAssignment && !existingAssignment && (
-                                                        <Check className="w-5 h-5 text-blue-600" />
-                                                    )}
-                                                    {tempAssignment && (
-                                                        <div className="flex items-center gap-2">
-                                                            <Check className="w-5 h-5 text-green-600" />
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleRemoveTemp(entry.periodId);
-                                                                }}
-                                                                className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                                            >
-                                                                <X className="w-3 h-3" />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                    {existingAssignment && (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded">ASSIGNED</span>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleDeleteExisting(existingAssignment.id);
-                                                                }}
-                                                                className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                                                title="Delete Proxy"
-                                                                disabled={deletingId === existingAssignment.id}
-                                                            >
-                                                                <Trash2 className={`w-3 h-3 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="space-y-1 mb-3">
-                                                    <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{entry.className}</div>
                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                        {entry.subjectName} ({entry.subjectCode})
+                                                        {entry.startTime} - {entry.endTime}
                                                     </div>
                                                 </div>
 
-                                                {isSelected && !tempAssignment && !existingAssignment && availableTeachers.length > 0 && (
-                                                    <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} onClick={(e) => e.stopPropagation()}>
-                                                        <label className={`text-xs font-medium block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                                            Assign Proxy Teacher:
-                                                        </label>
-                                                        <Autocomplete
-                                                            options={availableTeachers.map(t => ({
-                                                                id: t.id,
-                                                                label: t.name,
-                                                                sublabel: `${t.currentLoad} classes`
-                                                            }))}
-                                                            value=""
-                                                            onChange={(teacherId) => handleProxySelect(entry.periodId, teacherId)}
-                                                            onSearch={() => { }} // No search needed, already filtered
-                                                            placeholder="Select teacher..."
-                                                            locked={false}
-                                                            onUnlock={() => { }}
-                                                        />
-                                                    </div>
+                                                {/* Status Icons */}
+                                                {isSelected && !tempAssignment && !existingAssignment && (
+                                                    <Check className="w-5 h-5 text-blue-600" />
                                                 )}
-
                                                 {tempAssignment && (
-                                                    <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-green-200'}`}>
-                                                        <div className="text-xs font-medium text-green-700">
-                                                            Proxy: {getProxyTeacherName(tempAssignment.proxyTeacherId)}
-                                                        </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Check className="w-5 h-5 text-green-600" />
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRemoveTemp(entry.periodId);
+                                                            }}
+                                                            className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
                                                     </div>
                                                 )}
-
                                                 {existingAssignment && (
-                                                    <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-purple-200'}`}>
-                                                        <div className="text-xs font-medium text-purple-700">
-                                                            Proxy: {existingAssignment.assignedTeacher.name}
-                                                        </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded">ASSIGNED</span>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteExisting(existingAssignment.id);
+                                                            }}
+                                                            className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                                            title="Delete Proxy"
+                                                            disabled={deletingId === existingAssignment.id}
+                                                        >
+                                                            <Trash2 className={`w-3 h-3 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className={`rounded-xl overflow-hidden border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left border-collapse">
-                                            <thead>
-                                                <tr className={isDarkMode ? 'bg-gray-700 border-b border-gray-600' : 'bg-gray-50 border-b border-gray-200'}>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Period</th>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Time</th>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Class</th>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Subject</th>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Proxy Status</th>
-                                                    <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {teacherSchedule.map(entry => {
-                                                    const isSelected = selectedCells.has(entry.periodId);
-                                                    const tempAssignment = getTempAssignment(entry.periodId);
-                                                    const existingAssignment = getExistingAssignment(entry.periodId);
-                                                    const availableTeachers = availableTeachersMap[entry.periodId] || [];
-                                                    const hasPassed = isPeriodPast(entry.endTime);
 
-                                                    return (
-                                                        <tr key={entry.periodId} className={`border-b ${isDarkMode ? 'border-gray-700 hover:bg-gray-750' : 'border-gray-100 hover:bg-gray-50'} ${hasPassed ? 'opacity-50' : ''}`}>
-                                                            <td className={`p-4 font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                                {entry.periodNo}
-                                                                {hasPassed && (
-                                                                    <span className="ml-2 text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">PAST</span>
-                                                                )}
-                                                            </td>
-                                                            <td className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{entry.startTime} - {entry.endTime}</td>
-                                                            <td className={`p-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{entry.className}</td>
-                                                            <td className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{entry.subjectName}</td>
-                                                            <td className="p-4">
-                                                                {existingAssignment ? (
-                                                                    <span className="text-purple-600 font-medium">
-                                                                        {existingAssignment.assignedTeacher.name}
-                                                                    </span>
-                                                                ) : tempAssignment ? (
-                                                                    <span className="text-green-600 font-medium">
-                                                                        {getProxyTeacherName(tempAssignment.proxyTeacherId)} (Pending)
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>-</span>
-                                                                )}
-                                                            </td>
-                                                            <td className="p-4">
-                                                                {existingAssignment ? (
-                                                                    <button
-                                                                        onClick={() => handleDeleteExisting(existingAssignment.id)}
-                                                                        className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
-                                                                        title="Delete Proxy"
-                                                                        disabled={deletingId === existingAssignment.id}
-                                                                    >
-                                                                        <Trash2 className={`w-4 h-4 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
-                                                                    </button>
-                                                                ) : tempAssignment ? (
-                                                                    <button
-                                                                        onClick={() => handleRemoveTemp(entry.periodId)}
-                                                                        className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
-                                                                        title="Cancel"
-                                                                    >
-                                                                        <X className="w-4 h-4" />
-                                                                    </button>
-                                                                ) : (
-                                                                    teacherStatus && !hasPassed && (
-                                                                        isSelected ? (
-                                                                            <div className="w-64">
-                                                                                <select
-                                                                                    onClick={(e) => e.stopPropagation()}
-                                                                                    onChange={(e) => handleProxySelect(entry.periodId, e.target.value)}
-                                                                                    className={`w-full px-3 py-2 text-sm rounded-lg shadow-sm border-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-primary-300 text-gray-900'}`}
-                                                                                >
-                                                                                    <option value="">Select teacher...</option>
-                                                                                    {availableTeachers.map(teacher => (
-                                                                                        <option key={teacher.id} value={teacher.id}>
-                                                                                            {teacher.name} ({teacher.currentLoad})
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </select>
-                                                                            </div>
-                                                                        ) : (
-                                                                            <button
-                                                                                onClick={() => handleCellClick(entry.periodId)}
-                                                                                className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                                            <div className="space-y-1 mb-3">
+                                                <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{entry.className}</div>
+                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    {entry.subjectName} ({entry.subjectCode})
+                                                </div>
+                                            </div>
+
+                                            {isSelected && !tempAssignment && !existingAssignment && availableTeachers.length > 0 && (
+                                                <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} onClick={(e) => e.stopPropagation()}>
+                                                    <label className={`text-xs font-medium block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        Assign Proxy Teacher:
+                                                    </label>
+                                                    <Autocomplete
+                                                        options={availableTeachers.map(t => ({
+                                                            id: t.id,
+                                                            label: t.name,
+                                                            sublabel: `${t.currentLoad} classes`
+                                                        }))}
+                                                        value=""
+                                                        onChange={(teacherId) => handleProxySelect(entry.periodId, teacherId)}
+                                                        onSearch={() => { }} // No search needed, already filtered
+                                                        placeholder="Select teacher..."
+                                                        locked={false}
+                                                        onUnlock={() => { }}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {tempAssignment && (
+                                                <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-green-200'}`}>
+                                                    <div className="text-xs font-medium text-green-700">
+                                                        Proxy: {getProxyTeacherName(tempAssignment.proxyTeacherId)}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {existingAssignment && (
+                                                <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-purple-200'}`}>
+                                                    <div className="text-xs font-medium text-purple-700">
+                                                        Proxy: {existingAssignment.assignedTeacher.name}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className={`rounded-xl overflow-hidden border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className={isDarkMode ? 'bg-gray-700 border-b border-gray-600' : 'bg-gray-50 border-b border-gray-200'}>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Period</th>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Time</th>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Class</th>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Subject</th>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Proxy Status</th>
+                                                <th className={`p-4 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {teacherSchedule.map(entry => {
+                                                const isSelected = selectedCells.has(entry.periodId);
+                                                const tempAssignment = getTempAssignment(entry.periodId);
+                                                const existingAssignment = getExistingAssignment(entry.periodId);
+                                                const availableTeachers = availableTeachersMap[entry.periodId] || [];
+                                                const hasPassed = isPeriodPast(entry.endTime);
+
+                                                return (
+                                                    <tr key={entry.periodId} className={`border-b ${isDarkMode ? 'border-gray-700 hover:bg-gray-750' : 'border-gray-100 hover:bg-gray-50'} ${hasPassed ? 'opacity-50' : ''}`}>
+                                                        <td className={`p-4 font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                            {entry.periodNo}
+                                                            {hasPassed && (
+                                                                <span className="ml-2 text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">PAST</span>
+                                                            )}
+                                                        </td>
+                                                        <td className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{entry.startTime} - {entry.endTime}</td>
+                                                        <td className={`p-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{entry.className}</td>
+                                                        <td className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{entry.subjectName}</td>
+                                                        <td className="p-4">
+                                                            {existingAssignment ? (
+                                                                <span className="text-purple-600 font-medium">
+                                                                    {existingAssignment.assignedTeacher.name}
+                                                                </span>
+                                                            ) : tempAssignment ? (
+                                                                <span className="text-green-600 font-medium">
+                                                                    {getProxyTeacherName(tempAssignment.proxyTeacherId)} (Pending)
+                                                                </span>
+                                                            ) : (
+                                                                <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>-</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="p-4">
+                                                            {existingAssignment ? (
+                                                                <button
+                                                                    onClick={() => handleDeleteExisting(existingAssignment.id)}
+                                                                    className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                                                                    title="Delete Proxy"
+                                                                    disabled={deletingId === existingAssignment.id}
+                                                                >
+                                                                    <Trash2 className={`w-4 h-4 ${deletingId === existingAssignment.id ? 'animate-spin' : ''}`} />
+                                                                </button>
+                                                            ) : tempAssignment ? (
+                                                                <button
+                                                                    onClick={() => handleRemoveTemp(entry.periodId)}
+                                                                    className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                                                                    title="Cancel"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            ) : (
+                                                                teacherStatus && !hasPassed && (
+                                                                    isSelected ? (
+                                                                        <div className="w-64">
+                                                                            <select
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                                onChange={(e) => handleProxySelect(entry.periodId, e.target.value)}
+                                                                                className={`w-full px-3 py-2 text-sm rounded-lg shadow-sm border-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-primary-300 text-gray-900'}`}
                                                                             >
-                                                                                Assign Proxy
-                                                                            </button>
-                                                                        )
+                                                                                <option value="">Select teacher...</option>
+                                                                                {availableTeachers.map(teacher => (
+                                                                                    <option key={teacher.id} value={teacher.id}>
+                                                                                        {teacher.name} ({teacher.currentLoad})
+                                                                                    </option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handleCellClick(entry.periodId)}
+                                                                            className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                                                                        >
+                                                                            Assign Proxy
+                                                                        </button>
                                                                     )
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {/* Save Button */}
-                    {isLocked && tempAssignments.length > 0 && (
-                        <div className={`rounded-xl p-6 border-t-4 border-primary-500 shadow-2xl sticky bottom-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                                <div>
-                                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Proxy Assignments</h3>
-                                    <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        {tempAssignments.length} assignment{tempAssignments.length !== 1 ? 's' : ''} ready to save
-                                    </p>
-                                </div>
-                                <div className="flex gap-3 w-full md:w-auto">
-                                    <button
-                                        onClick={() => {
-                                            setTempAssignments([]);
-                                            setSelectedCells(new Set());
-                                        }}
-                                        className="btn btn-secondary flex-1 md:flex-none"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button onClick={handleSaveAll} className="btn btn-primary flex items-center justify-center gap-2 flex-1 md:flex-none" disabled={saving}>
-                                        <Save className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
-                                        {saving ? 'Saving...' : `Save All (${tempAssignments.length})`}
-                                    </button>
+                                                                )
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </>
+                )}
 
-                    {/* No Schedule Message */}
-                    {isLocked && !fetchingSchedule && teacherSchedule.length === 0 && (
-                        <div className={`rounded-xl p-12 text-center border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                            <Calendar className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>No Schedule Found</h3>
-                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                                This teacher has no classes scheduled for {currentDayName}
-                            </p>
+                {/* Save Button */}
+                {isLocked && tempAssignments.length > 0 && (
+                    <div className={`rounded-xl p-6 border-t-4 border-primary-500 shadow-2xl sticky bottom-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Proxy Assignments</h3>
+                                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    {tempAssignments.length} assignment{tempAssignments.length !== 1 ? 's' : ''} ready to save
+                                </p>
+                            </div>
+                            <div className="flex gap-3 w-full md:w-auto">
+                                <button
+                                    onClick={() => {
+                                        setTempAssignments([]);
+                                        setSelectedCells(new Set());
+                                    }}
+                                    className="btn btn-secondary flex-1 md:flex-none"
+                                >
+                                    Cancel
+                                </button>
+                                <button onClick={handleSaveAll} className="btn btn-primary flex items-center justify-center gap-2 flex-1 md:flex-none" disabled={saving}>
+                                    <Save className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
+                                    {saving ? 'Saving...' : `Save All (${tempAssignments.length})`}
+                                </button>
+                            </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {/* No Schedule Message */}
+                {isLocked && !fetchingSchedule && teacherSchedule.length === 0 && (
+                    <div className={`rounded-xl p-12 text-center border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <Calendar className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                        <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>No Schedule Found</h3>
+                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                            This teacher has no classes scheduled for {currentDayName}
+                        </p>
+                    </div>
+                )}
             </div>
-            );
+        </div>
+    );
 };
 
-            export default Proxies;
+export default Proxies;
