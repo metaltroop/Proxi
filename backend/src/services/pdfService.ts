@@ -101,7 +101,13 @@ export const generateTimetablePdf = (
                     {
                         columns: [
                             { text: 'Timetable', style: 'header', width: '*' },
-                            { image: logoPath, width: 60, alignment: 'right' }
+                            {
+                                stack: [
+                                    { image: logoPath, width: 50, alignment: 'right' },
+                                    { text: 'Made with Proxi', style: 'branding', alignment: 'right', margin: [0, 2, 0, 0] }
+                                ],
+                                width: 'auto'
+                            }
                         ],
                         margin: [0, 0, 0, 5]
                     } as any,
@@ -176,6 +182,11 @@ export const generateTimetablePdf = (
                         alignment: 'center',
                         color: '#9ca3af',
                         margin: [0, 5, 0, 0]
+                    },
+                    branding: {
+                        fontSize: 8,
+                        color: '#6b7280',
+                        italics: true
                     }
                 },
                 defaultStyle: {

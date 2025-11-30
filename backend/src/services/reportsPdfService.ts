@@ -68,7 +68,13 @@ export const generateProxyReportPdf = (
                     {
                         columns: [
                             { text: 'Proxy Assignment Report', style: 'header', width: '*' },
-                            { image: logoPath, width: 60, alignment: 'right' }
+                            {
+                                stack: [
+                                    { image: logoPath, width: 50, alignment: 'right' },
+                                    { text: 'Made with Proxi', style: 'branding', alignment: 'right', margin: [0, 2, 0, 0] }
+                                ],
+                                width: 'auto'
+                            }
                         ],
                         margin: [0, 0, 0, 10]
                     } as any,
@@ -146,6 +152,11 @@ export const generateProxyReportPdf = (
                         fontSize: 8,
                         color: '#6b7280',
                         alignment: 'center'
+                    },
+                    branding: {
+                        fontSize: 8,
+                        color: '#6b7280',
+                        italics: true
                     }
                 },
                 defaultStyle: {

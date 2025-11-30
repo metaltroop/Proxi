@@ -27,7 +27,8 @@ app.use(cors({
         'http://localhost:5173',
         'http://10.179.54.220:5173'
     ],
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['Content-Disposition']
 }));
 app.use(express.json());
 app.use(cookieParser());

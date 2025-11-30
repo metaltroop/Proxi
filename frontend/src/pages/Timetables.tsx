@@ -334,13 +334,20 @@ const Timetables: React.FC = () => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
+
+            // Extract filename from Content-Disposition header
             const contentDisposition = response.headers['content-disposition'];
+            console.log('Content-Disposition header:', contentDisposition);
             let fileName = 'timetable.pdf';
             if (contentDisposition) {
-                const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-                if (fileNameMatch && fileNameMatch.length === 2)
-                    fileName = fileNameMatch[1];
+                const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                console.log('Filename match:', fileNameMatch);
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = fileNameMatch[1].replace(/['"]/g, '');
+                }
             }
+            console.log('Final filename:', fileName);
+
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
