@@ -342,7 +342,7 @@ const Proxies: React.FC = () => {
                 </div>
 
                 {/* Teacher Search */}
-                <div className={`rounded-xl p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                <div className={`rounded-xl p-6 border relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
                             <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Today:</label>

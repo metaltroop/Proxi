@@ -18,6 +18,7 @@ import Records from './pages/Records';
 
 // Layout
 import DashboardLayout from './components/layout/DashboardLayout';
+import ScrollToTop from './components/ScrollToTop';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -65,6 +66,7 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <AppRoutes />
         </BrowserRouter>
       </ThemeProvider>

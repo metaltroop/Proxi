@@ -35,6 +35,7 @@ const Reports: React.FC = () => {
     // Stats State
     const [stats, setStats] = useState<Stats | null>(null);
     const [loadingStats, setLoadingStats] = useState(false);
+    const [downloadingPdf, setDownloadingPdf] = useState(false);
 
     useEffect(() => {
         if (activeTab === 'overview') {
@@ -73,13 +74,17 @@ const Reports: React.FC = () => {
     };
 
     const handleDownloadPdf = async () => {
+        if (downloadingPdf) return; // Prevent multiple clicks
+
+        setDownloadingPdf(true);
         try {
             const response = await api.get('/reports/proxies/download-pdf', {
                 params: { startDate, endDate },
                 responseType: 'blob'
             });
 
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             const filename = `proxy_report_${startDate}_to_${endDate}.pdf`;
@@ -87,10 +92,14 @@ const Reports: React.FC = () => {
             document.body.appendChild(link);
             link.click();
             link.remove();
-            window.URL.revokeObjectURL(url);
+
+            // Delay revocation to ensure download starts
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         } catch (error) {
             console.error('Download PDF error:', error);
             alert('Failed to download PDF');
+        } finally {
+            setDownloadingPdf(false);
         }
     };
 
@@ -290,9 +299,10 @@ const Reports: React.FC = () => {
                                 <button
                                     onClick={handleDownloadPdf}
                                     className="btn btn-secondary flex items-center gap-2"
+                                    disabled={downloadingPdf}
                                 >
-                                    <Download className="w-4 h-4" />
-                                    <span className="hidden md:inline">Download PDF</span>
+                                    <Download className={`w-4 h-4 ${downloadingPdf ? 'animate-spin' : ''}`} />
+                                    <span className="hidden md:inline">{downloadingPdf ? 'Downloading...' : 'Download PDF'}</span>
                                 </button>
                             )}
                         </div>

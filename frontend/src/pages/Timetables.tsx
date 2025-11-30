@@ -90,6 +90,17 @@ const Timetables: React.FC = () => {
 
     // Mobile state
     const [selectedDay, setSelectedDay] = useState(0); // Monday by default
+    const [downloadingPdf, setDownloadingPdf] = useState(false);
+    const [overflowVisible, setOverflowVisible] = useState(false);
+
+    useEffect(() => {
+        if (isSearchExpanded) {
+            const timer = setTimeout(() => setOverflowVisible(true), 300);
+            return () => clearTimeout(timer);
+        } else {
+            setOverflowVisible(false);
+        }
+    }, [isSearchExpanded]);
 
     useEffect(() => {
         fetchData();
@@ -307,6 +318,9 @@ const Timetables: React.FC = () => {
     const teacherOptions = teachers.map(t => ({ value: t.id, label: t.name }));
 
     const handleDownloadPdf = async () => {
+        if (downloadingPdf) return; // Prevent multiple clicks
+
+        setDownloadingPdf(true);
         try {
             const response = await api.get('/timetables/download-pdf', {
                 params: searchType === 'class'
@@ -316,24 +330,29 @@ const Timetables: React.FC = () => {
             });
 
             // Create blob link to download
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             const contentDisposition = response.headers['content-disposition'];
             let fileName = 'timetable.pdf';
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-                if (fileNameMatch.length === 2)
+                if (fileNameMatch && fileNameMatch.length === 2)
                     fileName = fileNameMatch[1];
             }
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
             link.remove();
-            window.URL.revokeObjectURL(url);
+
+            // Delay revocation to ensure download starts
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         } catch (error) {
             console.error('Download PDF error:', error);
             alert('Failed to download PDF');
+        } finally {
+            setDownloadingPdf(false);
         }
     };
 
@@ -397,7 +416,7 @@ const Timetables: React.FC = () => {
                         <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Create and manage class timetables</p>
                     </div>
 
-                    <div className={`rounded-xl border mb-6 transition-all duration-200 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div
                             className="p-4 flex items-center justify-between cursor-pointer"
                             onClick={() => setIsSearchExpanded(!isSearchExpanded)}
@@ -415,7 +434,7 @@ const Timetables: React.FC = () => {
                             {isSearchExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                         </div>
 
-                        <div className={`overflow-hidden transition-all duration-300 ease-ios ${isSearchExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className={`transition-all duration-300 ease-ios ${isSearchExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'}`}>
                             <div className="p-6 pt-0 space-y-4">
                                 <div className="flex items-center gap-4">
                                     <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Search by:</label>
@@ -506,9 +525,13 @@ const Timetables: React.FC = () => {
                                 <div className="flex items-center gap-3 w-full md:w-auto">
                                     {timetableExists && !isEditing && (
                                         <>
-                                            <button onClick={handleDownloadPdf} className="btn btn-secondary flex items-center gap-2 flex-1 md:flex-none">
-                                                <Download className="w-5 h-5" />
-                                                Download PDF
+                                            <button
+                                                onClick={handleDownloadPdf}
+                                                className="btn btn-secondary flex items-center gap-2 flex-1 md:flex-none"
+                                                disabled={downloadingPdf}
+                                            >
+                                                <Download className={`w-5 h-5 ${downloadingPdf ? 'animate-spin' : ''}`} />
+                                                {downloadingPdf ? 'Downloading...' : 'Download PDF'}
                                             </button>
                                             <button onClick={() => setIsEditing(true)} className="btn btn-primary flex items-center gap-2 flex-1 md:flex-none">
                                                 <Edit className="w-5 h-5" />
