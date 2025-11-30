@@ -17,6 +17,7 @@ import {
     Moon,
     Sun
 } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 const Sidebar: React.FC = () => {
     const { user, logout } = useAuth();
@@ -56,13 +57,14 @@ const Sidebar: React.FC = () => {
             {/* Logo */}
             <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'} flex items-center overflow-hidden`}>
                 {isCollapsed ? (
-                    <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-xl">P</span>
-                    </div>
+                    <img src={logo} alt="Proxi Logo" className={`w-12 h-12 object-contain ${!isDarkMode ? 'brightness-0' : ''}`} />
                 ) : (
-                    <div className="min-w-max">
-                        <h1 className="text-2xl font-bold text-primary-600">Proxi</h1>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>School Management</p>
+                    <div className="flex items-center gap-3 min-w-max">
+                        <img src={logo} alt="Proxi Logo" className={`w-16 h-16 object-contain ${!isDarkMode ? 'brightness-0' : ''}`} />
+                        <div>
+                            <h1 className="text-2xl font-bold text-primary-600">Proxi</h1>
+                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>School Management</p>
+                        </div>
                     </div>
                 )}
             </div>

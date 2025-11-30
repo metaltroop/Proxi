@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LogIn, Lock, Mail } from 'lucide-react';
 import { PRESET_ANIMATIONS } from '../../utils/animations';
+import logo from '../../assets/logo.png';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -39,6 +40,7 @@ const Login: React.FC = () => {
             <div className={`w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 ${PRESET_ANIMATIONS.cardEnter}`}>
                 {/* Logo */}
                 <div className="text-center mb-8">
+                    <img src={logo} alt="Proxi Logo" className="w-40 h-40 mx-auto mb-4 object-contain" />
                     <h1 className="text-4xl font-bold text-primary-600 mb-2 tracking-tight">Proxi</h1>
                     <p className="text-gray-600 font-medium">School Proxy Management System</p>
                 </div>

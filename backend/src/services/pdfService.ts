@@ -11,6 +11,8 @@ const fonts = {
     }
 };
 
+const logoPath = path.join(__dirname, '../assets/logo.png');
+
 const printer = new PdfPrinter(fonts);
 
 type TimetableWithRelations = Timetable & {
@@ -96,7 +98,13 @@ export const generateTimetablePdf = (
                 pageSize: 'A4',
                 pageMargins: [20, 20, 20, 20],
                 content: [
-                    { text: 'Timetable', style: 'header' },
+                    {
+                        columns: [
+                            { text: 'Timetable', style: 'header', width: '*' },
+                            { image: logoPath, width: 60, alignment: 'right' }
+                        ],
+                        margin: [0, 0, 0, 5]
+                    } as any,
                     { text: `${type === 'class' ? 'Class' : 'Teacher'}: ${name}`, style: 'subheader' },
                     {
                         table: {

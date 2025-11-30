@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Users, UserX, UserPlus, Activity, Calendar, Clock, ArrowRight, Plus, BarChart2, LayoutDashboard } from 'lucide-react';
+import { Users, UserX, UserPlus, Activity, Calendar, Clock, ArrowRight, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { PRESET_ANIMATIONS } from '../utils/animations';
@@ -59,38 +59,50 @@ const Dashboard: React.FC = () => {
         <>
             {/* Stats Cards */}
             <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${activeTab === 'overview' ? 'block' : 'hidden md:grid'}`}>
-                <div className={`card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 dark:from-blue-900 dark:to-blue-950 dark:border-blue-800 hover:shadow-lg transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-100`}>
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-100 ${isDarkMode
+                        ? 'bg-gradient-to-br from-blue-900 to-blue-950 border-blue-800'
+                        : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'
+                    } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-blue-600 dark:text-blue-300 mb-1">Total Teachers</p>
-                            <p className="text-4xl font-bold text-blue-900 dark:text-blue-100">{stats?.totalTeachers || 0}</p>
+                            <p className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>Total Teachers</p>
+                            <p className={`text-4xl font-bold ${isDarkMode ? 'text-blue-100' : 'text-blue-900'}`}>{stats?.totalTeachers || 0}</p>
                         </div>
-                        <div className="w-12 h-12 bg-blue-200 dark:bg-blue-800 rounded-full flex items-center justify-center shadow-inner">
-                            <Users className="w-6 h-6 text-blue-700 dark:text-blue-200" />
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner ${isDarkMode ? 'bg-blue-800' : 'bg-blue-200'
+                            }`}>
+                            <Users className={`w-6 h-6 ${isDarkMode ? 'text-blue-200' : 'text-blue-700'}`} />
                         </div>
                     </div>
                 </div>
 
-                <div className={`card bg-gradient-to-br from-red-50 to-red-100 border-red-200 dark:from-red-900 dark:to-red-950 dark:border-red-800 hover:shadow-lg transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-200`}>
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-200 ${isDarkMode
+                        ? 'bg-gradient-to-br from-red-900 to-red-950 border-red-800'
+                        : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200'
+                    } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-red-600 dark:text-red-300 mb-1">Absent Today</p>
-                            <p className="text-4xl font-bold text-red-900 dark:text-red-100">{stats?.teachersAbsentToday || 0}</p>
+                            <p className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>Absent Today</p>
+                            <p className={`text-4xl font-bold ${isDarkMode ? 'text-red-100' : 'text-red-900'}`}>{stats?.teachersAbsentToday || 0}</p>
                         </div>
-                        <div className="w-12 h-12 bg-red-200 dark:bg-red-800 rounded-full flex items-center justify-center shadow-inner">
-                            <UserX className="w-6 h-6 text-red-700 dark:text-red-200" />
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner ${isDarkMode ? 'bg-red-800' : 'bg-red-200'
+                            }`}>
+                            <UserX className={`w-6 h-6 ${isDarkMode ? 'text-red-200' : 'text-red-700'}`} />
                         </div>
                     </div>
                 </div>
 
-                <div className={`card bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-900 dark:to-green-950 dark:border-green-800 hover:shadow-lg transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-300`}>
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-300 ${isDarkMode
+                        ? 'bg-gradient-to-br from-green-900 to-green-950 border-green-800'
+                        : 'bg-gradient-to-br from-green-50 to-green-100 border-green-200'
+                    } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-green-600 dark:text-green-300 mb-1">Proxies Assigned</p>
-                            <p className="text-4xl font-bold text-green-900 dark:text-green-100">{stats?.proxiesAssignedToday || 0}</p>
+                            <p className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-green-300' : 'text-green-600'}`}>Proxies Assigned</p>
+                            <p className={`text-4xl font-bold ${isDarkMode ? 'text-green-100' : 'text-green-900'}`}>{stats?.proxiesAssignedToday || 0}</p>
                         </div>
-                        <div className="w-12 h-12 bg-green-200 dark:bg-green-800 rounded-full flex items-center justify-center shadow-inner">
-                            <UserPlus className="w-6 h-6 text-green-700 dark:text-green-200" />
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner ${isDarkMode ? 'bg-green-800' : 'bg-green-200'
+                            }`}>
+                            <UserPlus className={`w-6 h-6 ${isDarkMode ? 'text-green-200' : 'text-green-700'}`} />
                         </div>
                     </div>
                 </div>
@@ -99,42 +111,48 @@ const Dashboard: React.FC = () => {
             {/* Recent Activity & Quick Actions */}
             <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${activeTab === 'overview' ? 'block' : 'hidden md:grid'}`}>
                 {/* Recent Activity */}
-                <div className={`lg:col-span-2 card dark:bg-gray-800 dark:border-gray-700 ${PRESET_ANIMATIONS.slideInUp} delay-500`}>
+                <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-500 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                    }`}>
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">Recent Assignments</h2>
-                        <Link to="/reports" className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium flex items-center gap-1">
+                        <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Assignments</h2>
+                        <Link to="/reports" className={`text-sm font-medium flex items-center gap-1 ${isDarkMode ? 'text-primary-400 hover:text-primary-300' : 'text-primary-600 hover:text-primary-700'
+                            }`}>
                             View All <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
 
                     {stats?.recentProxies && stats.recentProxies.length > 0 ? (
                         <div className="space-y-4">
-                            {stats.recentProxies.map((proxy: any, index: number) => (
+                            {stats.recentProxies.map((proxy: any) => (
                                 <div
                                     key={proxy.id}
-                                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-100 dark:border-gray-700"
+                                    className={`flex items-center justify-between p-4 rounded-xl transition-colors border ${isDarkMode
+                                            ? 'bg-gray-700/50 border-gray-700 hover:bg-gray-700'
+                                            : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
+                                        }`}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isDarkMode ? 'bg-primary-900/30 text-primary-400' : 'bg-primary-100 text-primary-600'
+                                            }`}>
                                             {proxy.class.className.substring(0, 2)}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-900 dark:text-white">
+                                            <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                 {proxy.subject.shortCode} • Period {proxy.period.periodNo}
                                             </p>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                                <span className="text-red-500 dark:text-red-400">{proxy.absentTeacher.name}</span>
+                                            <p className={`text-sm flex items-center gap-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                <span className={isDarkMode ? 'text-red-400' : 'text-red-500'}>{proxy.absentTeacher.name}</span>
                                                 <ArrowRight className="w-3 h-3 text-gray-400" />
-                                                <span className="text-green-600 dark:text-green-400">{proxy.assignedTeacher.name}</span>
+                                                <span className={isDarkMode ? 'text-green-400' : 'text-green-600'}>{proxy.assignedTeacher.name}</span>
                                             </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 justify-end">
+                                        <div className={`text-xs flex items-center gap-1 justify-end ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                             <Clock className="w-3 h-3" />
                                             {format(new Date(proxy.createdAt), 'h:mm a')}
                                         </div>
-                                        <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
+                                        <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                                             {format(new Date(proxy.createdAt), 'MMM d')}
                                         </span>
                                     </div>
@@ -142,25 +160,33 @@ const Dashboard: React.FC = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                            <p className="text-gray-500 dark:text-gray-400">No recent activity found</p>
+                        <div className={`text-center py-12 rounded-xl border border-dashed ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
+                            }`}>
+                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>No recent activity found</p>
                         </div>
                     )}
                 </div>
 
                 {/* Quick Actions */}
-                <div className={`card h-fit dark:bg-gray-800 dark:border-gray-700 ${PRESET_ANIMATIONS.slideInUp} delay-600`}>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
+                <div className={`h-fit rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-600 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                    }`}>
+                    <h2 className={`text-lg font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h2>
                     <div className="space-y-3">
                         <Link to="/proxies" className="w-full btn btn-primary flex items-center justify-center gap-2 py-3">
                             <UserPlus className="w-5 h-5" />
                             Assign Proxy
                         </Link>
-                        <Link to="/teachers" className="w-full btn btn-secondary flex items-center justify-center gap-2 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200">
+                        <Link to="/teachers" className={`w-full btn flex items-center justify-center gap-2 py-3 border ${isDarkMode
+                                ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
+                                : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
+                            }`}>
                             <Plus className="w-5 h-5" />
                             Add Teacher
                         </Link>
-                        <Link to="/timetables" className="w-full btn btn-secondary flex items-center justify-center gap-2 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200">
+                        <Link to="/timetables" className={`w-full btn flex items-center justify-center gap-2 py-3 border ${isDarkMode
+                                ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
+                                : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
+                            }`}>
                             <Calendar className="w-5 h-5" />
                             View Timetables
                         </Link>
@@ -173,9 +199,10 @@ const Dashboard: React.FC = () => {
     const renderCharts = () => (
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${activeTab === 'analytics' ? 'block' : 'hidden md:grid'}`}>
             {/* Proxy Trends */}
-            <div className={`lg:col-span-2 card dark:bg-gray-800 dark:border-gray-700 ${PRESET_ANIMATIONS.slideInUp} delay-300`}>
+            <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-300 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                }`}>
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h2 className={`text-lg font-bold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         <Activity className="w-5 h-5 text-primary-600" />
                         Proxy Trends (Last 7 Days)
                     </h2>
@@ -218,8 +245,9 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Teacher Availability */}
-            <div className={`card dark:bg-gray-800 dark:border-gray-700 ${PRESET_ANIMATIONS.slideInUp} delay-400`}>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Teacher Availability</h2>
+            <div className={`rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-400 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                }`}>
+                <h2 className={`text-lg font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Teacher Availability</h2>
                 <div className="h-64 w-full relative">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -249,15 +277,15 @@ const Dashboard: React.FC = () => {
                     </ResponsiveContainer>
                     {/* Center Text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.totalTeachers || 0}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</span>
+                        <span className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{stats?.totalTeachers || 0}</span>
+                        <span className={`text-xs uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total</span>
                     </div>
                 </div>
                 <div className="flex justify-center gap-6 mt-4">
                     {stats?.teacherAvailability.map((entry, index) => (
                         <div key={index} className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></div>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">{entry.name}</span>
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{entry.name}</span>
                         </div>
                     ))}
                 </div>
@@ -270,8 +298,8 @@ const Dashboard: React.FC = () => {
             {/* Header */}
             <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${PRESET_ANIMATIONS.slideInRight}`}>
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">Dashboard</h1>
-                    <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <h1 className={`text-3xl font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dashboard</h1>
+                    <p className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         <Calendar className="w-4 h-4" />
                         {format(new Date(), 'EEEE, MMMM d, yyyy')}
                     </p>

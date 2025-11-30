@@ -66,7 +66,7 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply rounded-xl shadow-sm p-6;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 

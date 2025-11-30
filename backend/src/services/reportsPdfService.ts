@@ -11,6 +11,8 @@ const fonts = {
     }
 };
 
+const logoPath = path.join(__dirname, '../assets/logo.png');
+
 interface ProxyReport {
     id: string;
     date: Date;
@@ -64,9 +66,12 @@ export const generateProxyReportPdf = (
                 pageMargins: [40, 60, 40, 60],
                 content: [
                     {
-                        text: 'Proxy Assignment Report',
-                        style: 'header'
-                    },
+                        columns: [
+                            { text: 'Proxy Assignment Report', style: 'header', width: '*' },
+                            { image: logoPath, width: 60, alignment: 'right' }
+                        ],
+                        margin: [0, 0, 0, 10]
+                    } as any,
                     {
                         text: `Period: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`,
                         style: 'subheader'
