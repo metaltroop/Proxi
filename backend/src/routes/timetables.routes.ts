@@ -97,7 +97,7 @@ router.get('/download-pdf', authenticate, async (req: AuthRequest, res: Response
             name
         );
 
-        const formattedName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const formattedName = name.replace(/[^a-zA-Z0-9]/g, '_');
         res.setHeader('Content-Disposition', `attachment; filename="${formattedName}_timetable.pdf"`);
         res.send(pdfBuffer);
 
