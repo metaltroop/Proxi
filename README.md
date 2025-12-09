@@ -247,8 +247,15 @@ model Proxy {
 ### PDF Generation
 - **Timetables**: A4 landscape, custom fonts, single-page layout
 - **Reports**: A4 portrait, professional formatting, date ranges
-- Custom filenames with meaningful names
+- **Smart Filenames**: Auto-generated names (e.g., `TeacherName_timetable.pdf`)
+- **Download Feedback**: Loading states and progress indicators
 - Server-side generation for consistency
+
+### UI/UX Enhancements
+- **Animated Empty States**: Engaging illustrations when no data is present
+- **Loading Indicators**: Visual feedback for all async actions
+- **Scroll Management**: Smart scroll position handling between routes
+- **Z-Index Handling**: Polished dropdown and overlay interactions
 
 ### Authentication & Security
 - JWT-based authentication
@@ -327,7 +334,7 @@ npm run preview      # Preview production build
 
 ## 🎯 Roadmap
 
-- [ ] **Animations** - Smooth iOS-style transitions
+- [x] **Animations** - Smooth iOS-style transitions & Empty States
 - [ ] **Notifications** - Real-time alerts for proxy assignments
 - [ ] **Email Integration** - Automated notifications
 - [ ] **Attendance Tracking** - Student attendance module

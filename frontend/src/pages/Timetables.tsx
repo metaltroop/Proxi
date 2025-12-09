@@ -337,16 +337,13 @@ const Timetables: React.FC = () => {
 
             // Extract filename from Content-Disposition header
             const contentDisposition = response.headers['content-disposition'];
-            console.log('Content-Disposition header:', contentDisposition);
             let fileName = 'timetable.pdf';
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                console.log('Filename match:', fileNameMatch);
                 if (fileNameMatch && fileNameMatch[1]) {
                     fileName = fileNameMatch[1].replace(/['"]/g, '');
                 }
             }
-            console.log('Final filename:', fileName);
 
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
