@@ -466,7 +466,7 @@ const Timetables: React.FC = () => {
                     </div>
 
                     {isLocked && isEditing && (
-                        <div className={`rounded-xl border mb-6 transition-all duration-200 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-30 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div
                                 className="p-4 flex items-center justify-between cursor-pointer"
                                 onClick={() => setIsBulkExpanded(!isBulkExpanded)}
@@ -621,7 +621,7 @@ const Timetables: React.FC = () => {
                     )}
 
                     {/* Mobile View - Day Tabs + Period Cards */}
-                    {isLocked && !fetchingTimetable && timetableExists && (
+                    {isLocked && !fetchingTimetable && (timetableExists || isEditing) && (
                         <>
                             {/* Mobile View - 3 Day Range */}
                             <div className="md:hidden no-print">
