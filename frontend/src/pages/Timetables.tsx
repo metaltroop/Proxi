@@ -412,9 +412,9 @@ const Timetables: React.FC = () => {
         <>
             {/* Print Styles Removed - Using Backend PDF Generation */}
 
-            <div className={`flex flex-col h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-                {/* Sticky Header */}
-                <div className={`flex-shrink-0 p-4 md:p-8 no-print ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+                {/* Header */}
+                <div className={`p-4 md:p-8 no-print ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
                     <div className="mb-6">
                         <h1 className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Timetable Management</h1>
                         <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Create and manage class timetables</p>
@@ -466,7 +466,7 @@ const Timetables: React.FC = () => {
                     </div>
 
                     {isLocked && isEditing && (
-                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-30 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-40 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div
                                 className="p-4 flex items-center justify-between cursor-pointer"
                                 onClick={() => setIsBulkExpanded(!isBulkExpanded)}
@@ -513,7 +513,7 @@ const Timetables: React.FC = () => {
                         </div>
                     )}
 
-                    {isLocked && !fetchingTimetable && (
+                    {isLocked && !fetchingTimetable && !isEditing && (
                         <div className={`rounded-xl p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                 <div>
@@ -522,12 +522,12 @@ const Timetables: React.FC = () => {
                                     </h2>
                                     <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                         {timetableExists
-                                            ? (isEditing ? `${tempAssignments.length + pendingDeletions.length} pending changes` : 'View-only mode')
+                                            ? 'View-only mode'
                                             : (searchType === 'teacher' ? 'Create a new timetable to get started' : 'No timetable found')}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-3 w-full md:w-auto">
-                                    {timetableExists && !isEditing && (
+                                    {timetableExists && (
                                         <>
                                             <button
                                                 onClick={handleDownloadPdf}
@@ -543,18 +543,6 @@ const Timetables: React.FC = () => {
                                             </button>
                                         </>
                                     )}
-                                    {isEditing && (
-                                        <>
-                                            <button onClick={handleSaveAll} disabled={tempAssignments.length === 0 && pendingDeletions.length === 0}
-                                                className="btn btn-primary flex items-center gap-2 flex-1 md:flex-none">
-                                                <Save className="w-5 h-5" />
-                                                Save All
-                                            </button>
-                                            <button onClick={() => { setIsEditing(false); setTempAssignments([]); setPendingDeletions([]); setSelectedCells(new Set()); }} className="btn btn-secondary flex-1 md:flex-none">
-                                                Cancel
-                                            </button>
-                                        </>
-                                    )}
                                     {!timetableExists && searchType === 'teacher' && (
                                         <button onClick={handleCreateTimetable} className="btn btn-primary flex items-center gap-2 w-full md:w-auto">
                                             <Plus className="w-5 h-5" />
@@ -567,8 +555,8 @@ const Timetables: React.FC = () => {
                     )}
                 </div>
 
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8">
+                {/* Content */}
+                <div className="px-4 md:px-8 pb-24">
                     {/* Empty State - No Search Performed */}
                     {!isLocked && (
                         <div className={`rounded-xl p-12 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -678,7 +666,7 @@ const Timetables: React.FC = () => {
                                                 {periods.map(period => (
                                                     <tr key={period.id}>
                                                         <td className={`border p-2 font-medium ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
-                                                            <div className="text-xs font-bold">P{period.periodNo}</div>
+                                                            <div className="text-xs font-bold">{period.periodNo === 0 ? 'RECESS' : `P${period.periodNo}`}</div>
                                                             <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{period.startTime}</div>
                                                             <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{period.endTime}</div>
                                                         </td>
@@ -692,8 +680,8 @@ const Timetables: React.FC = () => {
 
                                                             return (
                                                                 <td key={cellKey}
-                                                                    className={`border p-1 transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? (isDarkMode ? 'bg-blue-900/50 border-blue-600' : 'bg-blue-50 border-blue-300') : ''}`}
-                                                                    onClick={() => handleCellClick(actualDayIndex, period.id)}>
+                                                                    className={`border p-1 transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} ${isEditing && period.periodNo !== 0 ? 'cursor-pointer' : period.periodNo === 0 ? 'cursor-not-allowed opacity-50' : ''} ${isSelected ? (isDarkMode ? 'bg-blue-900/50 border-blue-600' : 'bg-blue-50 border-blue-300') : ''}`}
+                                                                    onClick={() => period.periodNo !== 0 && handleCellClick(actualDayIndex, period.id)}>
                                                                     {tempEntry ? (
                                                                         <div className="text-center min-h-[60px] flex flex-col items-center justify-center p-1 relative">
                                                                             <div className="font-bold text-green-600 text-xs break-words w-full">
@@ -777,7 +765,7 @@ const Timetables: React.FC = () => {
                                                 {periods.map(period => (
                                                     <tr key={period.id}>
                                                         <td className={`border p-2 font-medium ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gradient-to-r from-purple-50 to-pink-50 border-gray-200 text-gray-800'}`}>
-                                                            <div className="text-xs font-semibold">P{period.periodNo}</div>
+                                                            <div className="text-xs font-semibold">{period.periodNo === 0 ? 'RECESS' : `P${period.periodNo}`}</div>
                                                             <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{period.startTime}-{period.endTime}</div>
                                                         </td>
                                                         {DAYS.map((day, dayIndex) => {
@@ -788,8 +776,8 @@ const Timetables: React.FC = () => {
                                                             const isSelected = selectedCells.has(cellKey);
                                                             return (
                                                                 <td key={cellKey}
-                                                                    className={`border p-2 transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? (isDarkMode ? 'bg-blue-900 border-blue-600' : 'bg-blue-50 border-blue-300') : ''} ${!isSelected && isEditing && !entry && !tempEntry ? (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50') : ''}`}
-                                                                    onClick={() => handleCellClick(dayIndex, period.id)}>
+                                                                    className={`border p-2 transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} ${isEditing && period.periodNo !== 0 ? 'cursor-pointer' : period.periodNo === 0 ? 'cursor-not-allowed opacity-50' : ''} ${isSelected ? (isDarkMode ? 'bg-blue-900 border-blue-600' : 'bg-blue-50 border-blue-300') : ''} ${!isSelected && isEditing && !entry && !tempEntry && period.periodNo !== 0 ? (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50') : ''}`}
+                                                                    onClick={() => period.periodNo !== 0 && handleCellClick(dayIndex, period.id)}>
                                                                     {tempEntry ? (
                                                                         <div className="text-center relative group min-h-[50px] flex items-center justify-center">
                                                                             <div>
@@ -837,7 +825,7 @@ const Timetables: React.FC = () => {
                                                                         </div>
                                                                     ) : (
                                                                         <div className={`text-center min-h-[50px] flex items-center justify-center text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                                                            {isEditing ? 'Click to select' : '-'}
+                                                                            {isSelected ? <Check className="w-5 h-5 text-primary-600" /> : (isEditing ? 'Click to select' : '-')}
                                                                         </div>
                                                                     )}
                                                                 </td>
@@ -853,6 +841,37 @@ const Timetables: React.FC = () => {
                         </>
                     )}
                 </div>
+
+                {/* Floating Action Bar - Save/Cancel Buttons */}
+                {isLocked && isEditing && (
+                    <div className="fixed bottom-8 right-8 flex items-center gap-3 no-print z-50">
+                        {/* Pending Changes Badge */}
+                        {(tempAssignments.length > 0 || pendingDeletions.length > 0) && (
+                            <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center font-bold text-lg ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'}`}>
+                                {tempAssignments.length + pendingDeletions.length}
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className={`flex items-center gap-2 rounded-lg shadow-2xl p-2 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                            <button
+                                onClick={() => { setIsEditing(false); setTempAssignments([]); setPendingDeletions([]); setSelectedCells(new Set()); }}
+                                className={`px-4 py-2 rounded-md transition-colors font-medium ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}
+                            >
+                                <X className="w-5 h-5 inline mr-1" />
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveAll}
+                                disabled={tempAssignments.length === 0 && pendingDeletions.length === 0}
+                                className="px-4 py-2 rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-lg"
+                            >
+                                <Save className="w-5 h-5 inline mr-1" />
+                                Save All
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );
