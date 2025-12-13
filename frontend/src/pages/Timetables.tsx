@@ -212,6 +212,11 @@ const Timetables: React.FC = () => {
     };
 
     const handleAddAssignments = () => {
+        console.log('handleAddAssignments called');
+        console.log('bulkSubjectId:', bulkSubjectId);
+        console.log('bulkClassId:', bulkClassId);
+        console.log('bulkTeacherId:', bulkTeacherId);
+
         if (!bulkSubjectId) {
             alert('Please select a subject');
             return;
@@ -466,7 +471,7 @@ const Timetables: React.FC = () => {
                     </div>
 
                     {isLocked && isEditing && (
-                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-40 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-50 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div
                                 className="p-4 flex items-center justify-between cursor-pointer"
                                 onClick={() => setIsBulkExpanded(!isBulkExpanded)}
