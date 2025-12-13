@@ -613,36 +613,25 @@ const Timetables: React.FC = () => {
                         <>
                             {/* Mobile View - 3 Day Range */}
                             <div className="md:hidden no-print">
-                                {/* Navigation Header */}
-                                <div className="flex items-center justify-between mb-4 bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                {/* Navigation Header - Segmented Control */}
+                                <div className={`flex p-1 mb-4 rounded-xl border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
                                     <button
-                                        onClick={() => setSelectedDay(Math.max(0, selectedDay - 3))}
-                                        disabled={selectedDay === 0}
-                                        className={`p-2 rounded-lg transition-colors ${selectedDay === 0
-                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                            : 'text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-gray-700'
+                                        onClick={() => setSelectedDay(0)}
+                                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${selectedDay === 0
+                                                ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
+                                                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
                                             }`}
                                     >
-                                        <div className="flex items-center gap-1 font-medium">
-                                            <span>←</span>
-                                            <span>Mon-Wed</span>
-                                        </div>
+                                        Mon - Wed
                                     </button>
-
-                                    <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
-
                                     <button
-                                        onClick={() => setSelectedDay(Math.min(3, selectedDay + 3))}
-                                        disabled={selectedDay >= 3}
-                                        className={`p-2 rounded-lg transition-colors ${selectedDay >= 3
-                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                            : 'text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-gray-700'
+                                        onClick={() => setSelectedDay(3)}
+                                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${selectedDay >= 3
+                                                ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
+                                                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
                                             }`}
                                     >
-                                        <div className="flex items-center gap-1 font-medium">
-                                            <span>Thu-Sat</span>
-                                            <span>→</span>
-                                        </div>
+                                        Thu - Sat
                                     </button>
                                 </div>
 

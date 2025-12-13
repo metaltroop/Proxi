@@ -28,13 +28,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
         <>
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black/50 z-[200] md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
             {/* Menu Panel */}
             <div
-                className={`fixed bottom-0 left-0 right-0 z-50 md:hidden rounded-t-3xl shadow-2xl overflow-y-auto transition-transform duration-300 ease-out pb-safe ${isOpen ? 'translate-y-0' : 'translate-y-full'} ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+                className={`fixed bottom-0 left-0 right-0 z-[201] md:hidden rounded-t-3xl shadow-2xl overflow-y-auto transition-transform duration-300 ease-out pb-safe ${isOpen ? 'translate-y-0' : 'translate-y-full'} ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
                 style={{ maxHeight: 'calc(85vh + env(safe-area-inset-bottom, 20px))' }}
             >
                 {/* Header */}
