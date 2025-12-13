@@ -212,11 +212,6 @@ const Timetables: React.FC = () => {
     };
 
     const handleAddAssignments = () => {
-        console.log('handleAddAssignments called');
-        console.log('bulkSubjectId:', bulkSubjectId);
-        console.log('bulkClassId:', bulkClassId);
-        console.log('bulkTeacherId:', bulkTeacherId);
-
         if (!bulkSubjectId) {
             alert('Please select a subject');
             return;
@@ -318,9 +313,9 @@ const Timetables: React.FC = () => {
         return subjects;
     };
 
-    const subjectOptions = getFilteredSubjects().map(s => ({ value: s.id, label: `${s.subjectName} (${s.shortCode})` }));
-    const classOptions = classes.map(c => ({ value: c.id, label: c.className }));
-    const teacherOptions = teachers.map(t => ({ value: t.id, label: t.name }));
+    const subjectOptions = getFilteredSubjects().map(s => ({ id: s.id, label: `${s.subjectName} (${s.shortCode})` }));
+    const classOptions = classes.map(c => ({ id: c.id, label: c.className }));
+    const teacherOptions = teachers.map(t => ({ id: t.id, label: t.name }));
 
     const handleDownloadPdf = async () => {
         if (downloadingPdf) return; // Prevent multiple clicks
@@ -473,7 +468,7 @@ const Timetables: React.FC = () => {
                     {isLocked && isEditing && (
                         <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-50 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div
-                                className="p-4 flex items-center justify-between cursor-pointer"
+                                className="p-4 flex items-center justify-between cursor-pointer "
                                 onClick={() => setIsBulkExpanded(!isBulkExpanded)}
                             >
                                 <div className="flex items-center gap-2">
@@ -487,7 +482,7 @@ const Timetables: React.FC = () => {
                                 {isBulkExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                             </div>
 
-                            <div className={`overflow-hidden transition-all duration-300 ease-ios ${isBulkExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className={`transition-all duration-300 ease-ios ${isBulkExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 <div className="p-6 pt-0">
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <Dropdown options={subjectOptions} value={bulkSubjectId} onChange={setBulkSubjectId}
@@ -849,7 +844,7 @@ const Timetables: React.FC = () => {
 
                 {/* Floating Action Bar - Save/Cancel Buttons */}
                 {isLocked && isEditing && (
-                    <div className="fixed bottom-8 right-8 flex items-center gap-3 no-print z-50">
+                    <div className="fixed bottom-24 md:bottom-8 right-8 flex items-center gap-3 no-print z-50">
                         {/* Pending Changes Badge */}
                         {(tempAssignments.length > 0 || pendingDeletions.length > 0) && (
                             <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center font-bold text-lg ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'}`}>

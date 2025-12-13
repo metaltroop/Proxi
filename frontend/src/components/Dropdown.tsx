@@ -50,7 +50,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                 ${isOpen
                         ? 'border-primary-500 ring-2 ring-primary-500'
                         : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-primary-400')}
-                ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
+                ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-whit e text-gray-900'}`}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className={`flex-1 ${!selectedOption ? (isDarkMode ? 'text-gray-500' : 'text-gray-400') : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
@@ -74,7 +74,7 @@ const Dropdown: React.FC<DropdownProps> = ({
             </div>
 
             {isOpen && (
-                <div className={`absolute z-50 w-full mt-2 border-2 rounded-xl shadow-xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 origin-top
+                <div className={`absolute z-[100] w-full mt-2 border-2 rounded-xl shadow-xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 origin-top
                     ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`}>
                     {options.map((option) => (
                         <button
