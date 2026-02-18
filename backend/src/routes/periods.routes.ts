@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import prisma from '../config/database';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { UserRole } from '@prisma/client';
+import { handleRouteError } from '../utils/errorHandler';
 
 const router = Router();
 
@@ -15,8 +16,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 
         res.json({ periods });
     } catch (error) {
-        console.error('Get periods error:', error);
-        res.status(500).json({ error: 'Failed to get periods' });
+        handleRouteError(res, error, 'Get periods');
     }
 });
 
@@ -33,8 +33,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
         res.json({ period });
     } catch (error) {
-        console.error('Get period error:', error);
-        res.status(500).json({ error: 'Failed to get period' });
+        handleRouteError(res, error, 'Get period');
     }
 });
 
@@ -59,8 +58,7 @@ router.post('/', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR), 
 
         res.status(201).json({ period });
     } catch (error) {
-        console.error('Create period error:', error);
-        res.status(500).json({ error: 'Failed to create period' });
+        handleRouteError(res, error, 'Create period');
     }
 });
 
@@ -86,8 +84,7 @@ router.put('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR)
 
         res.json({ period });
     } catch (error) {
-        console.error('Update period error:', error);
-        res.status(500).json({ error: 'Failed to update period' });
+        handleRouteError(res, error, 'Update period');
     }
 });
 
@@ -101,8 +98,7 @@ router.delete('/:id', authenticate, authorize(UserRole.ADMIN), async (req: AuthR
 
         res.json({ message: 'Period deleted successfully' });
     } catch (error) {
-        console.error('Delete period error:', error);
-        res.status(500).json({ error: 'Failed to delete period' });
+        handleRouteError(res, error, 'Delete period');
     }
 });
 

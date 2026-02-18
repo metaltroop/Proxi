@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import prisma from '../config/database';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { UserRole } from '@prisma/client';
+import { handleRouteError } from '../utils/errorHandler';
 
 const router = Router();
 
@@ -35,8 +36,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 
         res.json({ classes });
     } catch (error) {
-        console.error('Get classes error:', error);
-        res.status(500).json({ error: 'Failed to get classes' });
+        handleRouteError(res, error, 'Get classes');
     }
 });
 
@@ -63,8 +63,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
         res.json({ class: classData });
     } catch (error) {
-        console.error('Get class error:', error);
-        res.status(500).json({ error: 'Failed to get class' });
+        handleRouteError(res, error, 'Get class');
     }
 });
 
@@ -94,8 +93,7 @@ router.post('/bulk', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATO
             count: result.count
         });
     } catch (error) {
-        console.error('Bulk create classes error:', error);
-        res.status(500).json({ error: 'Failed to create classes' });
+        handleRouteError(res, error, 'Bulk create classes');
     }
 });
 
@@ -146,8 +144,7 @@ router.put('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.COORDINATOR)
 
         res.json({ class: classData });
     } catch (error) {
-        console.error('Update class error:', error);
-        res.status(500).json({ error: 'Failed to update class' });
+        handleRouteError(res, error, 'Update class');
     }
 });
 
@@ -161,8 +158,7 @@ router.delete('/:id', authenticate, authorize(UserRole.ADMIN), async (req: AuthR
 
         res.json({ message: 'Class deleted successfully' });
     } catch (error) {
-        console.error('Delete class error:', error);
-        res.status(500).json({ error: 'Failed to delete class' });
+        handleRouteError(res, error, 'Delete class');
     }
 });
 
@@ -184,8 +180,7 @@ router.get('/:id/timetable', authenticate, async (req: AuthRequest, res: Respons
 
         res.json({ timetable });
     } catch (error) {
-        console.error('Get timetable error:', error);
-        res.status(500).json({ error: 'Failed to get timetable' });
+        handleRouteError(res, error, 'Get timetable');
     }
 });
 
