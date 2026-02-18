@@ -1,0 +1,7 @@
+backend/node_modules
+reporting-service/node_modules
+frontend/node_modules
+
+backend/.env
+frontend/.env
+reporting-service/.env
