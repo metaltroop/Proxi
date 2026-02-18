@@ -12,6 +12,7 @@ import Classes from './pages/Classes';
 import Subjects from './pages/Subjects';
 import Periods from './pages/Periods';
 import Timetables from './pages/Timetables';
+import BulkDownload from './pages/BulkDownload';
 import Proxies from './pages/Proxies';
 import Reports from './pages/Reports';
 import Records from './pages/Records';
@@ -53,6 +54,7 @@ function AppRoutes() {
         <Route path="subjects" element={<Subjects />} />
         <Route path="periods" element={<Periods />} />
         <Route path="timetables" element={<Timetables />} />
+        <Route path="timetables/bulk" element={<BulkDownload />} />
         <Route path="proxies" element={<Proxies />} />
         <Route path="reports" element={<Reports />} />
         <Route path="records" element={<Records />} />

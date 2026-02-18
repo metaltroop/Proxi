@@ -25,7 +25,9 @@ app.use(cors({
     origin: [
         process.env.FRONTEND_URL || 'http://localhost:5174',
         'http://localhost:5173',
-        'http://10.179.54.220:5173'
+        'http://10.151.216.220:5173',
+        'capacitor://localhost',
+        'http://localhost'
     ],
     credentials: true,
     exposedHeaders: ['Content-Disposition']
@@ -59,4 +61,15 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 app.listen(PORT, () => {
     console.log(`🚀 Proxi API server running on http://localhost:${PORT}`);
+
+    // Internal Keep-Alive: Ping Reporting Service every 5 minutes
+    const REPORTING_SERVICE_URL = process.env.REPORTING_SERVICE_URL || 'http://localhost:3001';
+    setInterval(async () => {
+        try {
+            await fetch(`${REPORTING_SERVICE_URL}/health`);
+            // console.log('Pinged Reporting Service to keep alive');
+        } catch (error) {
+            console.error('Failed to ping Reporting Service');
+        }
+    }, 5 * 60 * 1000);
 });

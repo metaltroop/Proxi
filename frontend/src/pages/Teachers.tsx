@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { Plus, Search, Edit2, Trash2, LayoutGrid, Table as TableIcon, RefreshCw, X, Check, Calendar } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, LayoutGrid, Table as TableIcon, RefreshCw, X, Calendar } from 'lucide-react';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
 

@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../config/database';
 
 router.get('/stats', async (req: Request, res: Response) => {
     try {
@@ -12,48 +12,65 @@ router.get('/stats', async (req: Request, res: Response) => {
         const endOfToday = endOfDay(today);
         const sevenDaysAgo = subDays(today, 6);
 
-        // 1. Total Teachers
-        const totalTeachers = await prisma.teacher.count({
-            where: { isActive: true }
-        });
-
-        // 2. Teachers Absent Today
-        // We check TeacherAbsence table for today
-        const absentTeachersCount = await prisma.teacherAbsence.count({
-            where: {
-                date: {
-                    gte: startOfToday,
-                    lte: endOfToday
+        // Run all independent queries in parallel
+        const [
+            totalTeachers,
+            absentTeachersCount,
+            proxiesTodayCount,
+            proxiesLast7Days,
+            recentProxies
+        ] = await Promise.all([
+            // 1. Total Teachers
+            prisma.teacher.count({
+                where: { isActive: true }
+            }),
+            // 2. Teachers Absent Today
+            prisma.teacherAbsence.count({
+                where: {
+                    date: {
+                        gte: startOfToday,
+                        lte: endOfToday
+                    }
                 }
-            }
-        });
-
-        // 3. Proxies Assigned Today
-        const proxiesTodayCount = await prisma.proxy.count({
-            where: {
-                date: {
-                    gte: startOfToday,
-                    lte: endOfToday
+            }),
+            // 3. Proxies Assigned Today
+            prisma.proxy.count({
+                where: {
+                    date: {
+                        gte: startOfToday,
+                        lte: endOfToday
+                    }
                 }
-            }
-        });
-
-        // 4. Proxy Trends (Last 7 Days)
-        const proxiesLast7Days = await prisma.proxy.groupBy({
-            by: ['date'],
-            where: {
-                date: {
-                    gte: startOfDay(sevenDaysAgo),
-                    lte: endOfToday
+            }),
+            // 4. Proxy Trends (Last 7 Days)
+            prisma.proxy.groupBy({
+                by: ['date'],
+                where: {
+                    date: {
+                        gte: startOfDay(sevenDaysAgo),
+                        lte: endOfToday
+                    }
+                },
+                _count: {
+                    id: true
+                },
+                orderBy: {
+                    date: 'asc'
                 }
-            },
-            _count: {
-                id: true
-            },
-            orderBy: {
-                date: 'asc'
-            }
-        });
+            }),
+            // 5. Recent Activity (Last 5 proxies)
+            prisma.proxy.findMany({
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    absentTeacher: { select: { name: true } },
+                    assignedTeacher: { select: { name: true } },
+                    class: { select: { className: true } },
+                    subject: { select: { shortCode: true } },
+                    period: { select: { periodNo: true } }
+                }
+            })
+        ]);
 
         // Format trends for frontend
         const proxyTrends = [];
@@ -67,20 +84,7 @@ router.get('/stats', async (req: Request, res: Response) => {
             });
         }
 
-        // 5. Recent Activity (Last 5 proxies)
-        const recentProxies = await prisma.proxy.findMany({
-            take: 5,
-            orderBy: { createdAt: 'desc' },
-            include: {
-                absentTeacher: { select: { name: true } },
-                assignedTeacher: { select: { name: true } },
-                class: { select: { className: true } },
-                subject: { select: { shortCode: true } },
-                period: { select: { periodNo: true } }
-            }
-        });
-
-        // 6. Teacher Availability
+        // 6. Teacher Availability (derived from parallel results)
         const teacherAvailability = [
             { name: 'Present', value: totalTeachers - absentTeachersCount, color: '#10B981' }, // Green
             { name: 'Absent', value: absentTeachersCount, color: '#EF4444' } // Red

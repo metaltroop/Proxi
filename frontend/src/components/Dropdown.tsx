@@ -13,13 +13,16 @@ interface DropdownProps {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    label?: string;
+    required?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
     options,
     value,
     onChange,
-    placeholder = 'Select...'
+    placeholder = 'Select...',
+    label
 }) => {
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
@@ -45,6 +48,11 @@ const Dropdown: React.FC<DropdownProps> = ({
 
     return (
         <div ref={wrapperRef} className="relative">
+            {label && (
+                <label className={`block mb-1 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {label}
+                </label>
+            )}
             <div
                 className={`flex items-center justify-between w-full px-4 py-3 border-2 rounded-xl cursor-pointer transition-all
                 ${isOpen

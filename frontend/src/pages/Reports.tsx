@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import api from '../services/api';
-import { Calendar, Download, TrendingUp, Users, UserX, Award } from 'lucide-react';
+import { Calendar, Download, TrendingUp, UserX, Award } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 interface ProxyReport {
@@ -23,7 +23,7 @@ interface Stats {
 
 const Reports: React.FC = () => {
     const { isDarkMode } = useTheme();
-    const navigate = useNavigate();
+
     const [activeTab, setActiveTab] = useState<'overview' | 'proxy'>('overview');
 
     // Proxy Report State

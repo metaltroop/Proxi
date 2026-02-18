@@ -13,12 +13,12 @@ const fonts = {
 
 const logoPath = path.join(__dirname, '../assets/logo.png');
 
-interface ProxyReport {
+export interface ProxyReport {
     id: string;
-    date: Date;
+    date: string | Date; // Allow string date
     absentTeacher: { name: string; employeeId: string | null };
     assignedTeacher: { name: string; employeeId: string | null };
-    class: { className: string; standard: number; division: string };
+    class: { className: string; standard: string | number; division: string }; // Allow standard to be string
     subject: { subjectName: string; shortCode: string };
     period: { periodNo: number; startTime: string; endTime: string };
     status: string;
@@ -164,7 +164,8 @@ export const generateProxyReportPdf = (
                 }
             };
 
-            const pdfDoc = printer.createPdfKitDocument(docDefinition);
+            const printerInstance = new PdfPrinter(fonts);
+            const pdfDoc = printerInstance.createPdfKitDocument(docDefinition);
             const chunks: Buffer[] = [];
 
             pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));

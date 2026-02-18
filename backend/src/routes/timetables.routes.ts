@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import prisma from '../config/database';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { UserRole, DayOfWeek } from '@prisma/client';
-import { generateTimetablePdf } from '../services/pdfService';
+import { getTimetablePdf, getBulkTimetablePdf } from '../services/reportingClient';
 
 const router = Router();
 
@@ -90,14 +90,15 @@ router.get('/download-pdf', authenticate, async (req: AuthRequest, res: Response
             name = teacherData.name;
         }
 
-        const pdfBuffer = await generateTimetablePdf(
-            timetable as any, // Type assertion needed due to strict typing in service
+        const pdfBuffer = await getTimetablePdf(
+            timetable as any,
             periods,
             classId ? 'class' : 'teacher',
             name
         );
 
         const formattedName = name.replace(/[^a-zA-Z0-9]/g, '_');
+        res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${formattedName}_timetable.pdf"`);
         res.send(pdfBuffer);
 
@@ -299,6 +300,79 @@ router.post('/conflicts', authenticate, async (req: AuthRequest, res: Response) 
     } catch (error) {
         console.error('Check conflicts error:', error);
         res.status(500).json({ error: 'Failed to check conflicts' });
+    }
+});
+
+// Download bulk timetable PDF
+router.post('/download-bulk-pdf', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const { classIds, teacherIds } = req.body;
+
+        if ((!classIds || classIds.length === 0) && (!teacherIds || teacherIds.length === 0)) {
+            return res.status(400).json({ error: 'classIds or teacherIds must be provided' });
+        }
+
+        const periods = await prisma.period.findMany();
+        const items: any[] = [];
+
+        // Fetch Class Timetables
+        if (classIds && classIds.length > 0) {
+            const classes = await prisma.class.findMany({
+                where: { id: { in: classIds } },
+                include: {
+                    timetables: {
+                        include: {
+                            subject: true,
+                            teacher: true,
+                            class: true,
+                            period: true
+                        }
+                    }
+                }
+            });
+
+            classes.forEach(cls => {
+                items.push({
+                    timetable: cls.timetables,
+                    type: 'class',
+                    name: cls.className
+                });
+            });
+        }
+
+        // Fetch Teacher Timetables
+        if (teacherIds && teacherIds.length > 0) {
+            const teachers = await prisma.teacher.findMany({
+                where: { id: { in: teacherIds } },
+                include: {
+                    timetables: {
+                        include: {
+                            subject: true,
+                            teacher: true,
+                            class: true,
+                            period: true
+                        }
+                    }
+                }
+            });
+
+            teachers.forEach(teacher => {
+                items.push({
+                    timetable: teacher.timetables,
+                    type: 'teacher',
+                    name: teacher.name
+                });
+            });
+        }
+
+        const pdfBuffer = await getBulkTimetablePdf({ items, periods });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="timetables_bulk.pdf"');
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error('Download bulk PDF error:', error);
+        res.status(500).json({ error: 'Failed to download bulk PDF' });
     }
 });
 

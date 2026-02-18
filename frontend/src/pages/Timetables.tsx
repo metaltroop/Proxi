@@ -289,7 +289,7 @@ const Timetables: React.FC = () => {
 
     const getTeacherName = (teacherId: string) => teachers.find(t => t.id === teacherId)?.name || '';
     const getSubjectCode = (subjectId: string) => subjects.find(s => s.id === subjectId)?.shortCode || '';
-    const getSubjectName = (subjectId: string) => subjects.find(s => s.id === subjectId)?.subjectName || '';
+
     const getClassDisplay = (classId: string) => {
         const cls = classes.find(c => c.id === classId);
         return cls ? `${cls.standard}${cls.division.charAt(0)}` : '';
@@ -415,9 +415,18 @@ const Timetables: React.FC = () => {
             <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
                 {/* Header */}
                 <div className={`p-4 md:p-8 no-print ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                    <div className="mb-6">
-                        <h1 className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Timetable Management</h1>
-                        <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Create and manage class timetables</p>
+                    <div className="mb-6 flex items-center justify-between">
+                        <div>
+                            <h1 className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Timetable Management</h1>
+                            <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Create and manage class timetables</p>
+                        </div>
+                        <button
+                            onClick={() => navigate('/timetables/bulk')}
+                            className={`btn btn-secondary flex items-center gap-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700' : ''}`}
+                        >
+                            <Download className="w-5 h-5" />
+                            Bulk Download
+                        </button>
                     </div>
 
                     <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -618,8 +627,8 @@ const Timetables: React.FC = () => {
                                     <button
                                         onClick={() => setSelectedDay(0)}
                                         className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${selectedDay === 0
-                                                ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
-                                                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
+                                            ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
+                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
                                             }`}
                                     >
                                         Mon - Wed
@@ -627,8 +636,8 @@ const Timetables: React.FC = () => {
                                     <button
                                         onClick={() => setSelectedDay(3)}
                                         className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${selectedDay >= 3
-                                                ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
-                                                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
+                                            ? (isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5')
+                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-700/50' : 'text-gray-500 hover:bg-gray-200/50')
                                             }`}
                                     >
                                         Thu - Sat
@@ -757,7 +766,7 @@ const Timetables: React.FC = () => {
                                                             <div className="text-xs font-semibold">{period.periodNo === 0 ? 'RECESS' : `P${period.periodNo}`}</div>
                                                             <div className={`text-[10px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{period.startTime}-{period.endTime}</div>
                                                         </td>
-                                                        {DAYS.map((day, dayIndex) => {
+                                                        {DAYS.map((_day, dayIndex) => {
                                                             const entry = getTimetableEntry(dayIndex, period.id);
                                                             const tempEntry = getTempAssignment(dayIndex, period.id);
                                                             const isPending = isPendingDeletion(dayIndex, period.id);

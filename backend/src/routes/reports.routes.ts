@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { getProxyReportPdf } from '../services/reportingClient';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -207,8 +208,7 @@ router.get('/proxies/download-pdf', async (req: Request, res: Response) => {
         });
 
         // Generate PDF
-        const { generateProxyReportPdf } = await import('../services/reportsPdfService');
-        const pdfBuffer = await generateProxyReportPdf(
+        const pdfBuffer = await getProxyReportPdf(
             proxies as any,
             startDate as string || new Date().toISOString().split('T')[0],
             endDate as string || new Date().toISOString().split('T')[0]

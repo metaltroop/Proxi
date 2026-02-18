@@ -104,6 +104,23 @@ export const PRESET_ANIMATIONS = {
         ANIMATION_CLASSES.slideOutToBottom,
         DURATION_CLASSES.fast
     ),
+
+    // Missing animations used in Dashboard
+    slideInUp: combineAnimations(
+        ANIMATION_CLASSES.slideInFromBottom,
+        ANIMATION_CLASSES.fadeIn,
+        DURATION_CLASSES.normal
+    ),
+    slideInRight: combineAnimations(
+        ANIMATION_CLASSES.slideInFromRight,
+        ANIMATION_CLASSES.fadeIn,
+        DURATION_CLASSES.normal
+    ),
+    scaleIn: combineAnimations(
+        ANIMATION_CLASSES.scaleIn,
+        ANIMATION_CLASSES.fadeIn,
+        DURATION_CLASSES.normal
+    ),
 } as const;
 
 // React component animation hook
