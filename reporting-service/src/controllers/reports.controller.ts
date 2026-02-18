@@ -11,10 +11,9 @@ export const generateProxyReport = async (req: Request, res: Response) => {
         }
 
         const pdfBuffer = await generateProxyReportPdf(proxies, startDate, endDate);
+        const pdfBase64 = pdfBuffer.toString('base64');
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="proxy_report.pdf"`);
-        res.send(pdfBuffer);
+        res.json({ pdfBase64 });
     } catch (error) {
         console.error('Error generating proxy report PDF:', error);
         res.status(500).json({ error: 'Failed to generate PDF' });
@@ -30,10 +29,9 @@ export const generateTimetable = async (req: Request, res: Response) => {
         }
 
         const pdfBuffer = await generateTimetablePdf(timetable, periods, type, name);
+        const pdfBase64 = pdfBuffer.toString('base64');
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="timetable_${name}.pdf"`);
-        res.send(pdfBuffer);
+        res.json({ pdfBase64 });
     } catch (error) {
         console.error('Error generating timetable PDF:', error);
         res.status(500).json({ error: 'Failed to generate PDF' });
@@ -49,10 +47,9 @@ export const generateBulkTimetable = async (req: Request, res: Response) => {
         }
 
         const pdfBuffer = await generateBulkTimetablePdf(items, periods);
+        const pdfBase64 = pdfBuffer.toString('base64');
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="timetables_bulk.pdf"`);
-        res.send(pdfBuffer);
+        res.json({ pdfBase64 });
     } catch (error) {
         console.error('Error generating bulk timetable PDF:', error);
         res.status(500).json({ error: 'Failed to generate PDF' });

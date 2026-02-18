@@ -27,6 +27,7 @@ app.use(cors({
         'http://localhost:5173',
         'http://10.151.216.220:5173',
         'capacitor://localhost',
+        'http://192.168.1.63:5173',
         'http://localhost'
     ],
     credentials: true,
@@ -71,5 +72,5 @@ app.listen(PORT, () => {
         } catch (error) {
             console.error('Failed to ping Reporting Service');
         }
-    }, 5 * 60 * 1000);
+    }, 2 * 60 * 1000);
 });
