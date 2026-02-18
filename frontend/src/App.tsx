@@ -16,6 +16,7 @@ import BulkDownload from './pages/BulkDownload';
 import Proxies from './pages/Proxies';
 import Reports from './pages/Reports';
 import Records from './pages/Records';
+import Landing from './pages/Landing';
 
 // Layout
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -39,6 +40,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/landing" element={<Landing />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route
         path="/"
