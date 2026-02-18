@@ -137,9 +137,24 @@ cp .env.example .env
 npm run dev
 ```
 
+### Reporting Service Setup (New)
+```bash
+cd reporting-service
+
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Start service (Run this on a separate terminal)
+npm run start
+```
+
 The application will be available at:
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:3000`
+- Reporting Service: `http://localhost:3001`
 
 ## 🗄️ Database Schema
 
@@ -294,13 +309,20 @@ AGbackend/
 ├── backend/
 │   ├── src/
 │   │   ├── routes/          # API endpoints
-│   │   ├── services/        # Business logic & PDF generation
+│   │   ├── services/        # Business logic
 │   │   ├── middleware/      # Auth, error handling
 │   │   └── index.ts         # Server entry point
 │   ├── prisma/
 │   │   ├── schema.prisma    # Database schema
 │   │   └── migrations/      # Database migrations
 │   └── fonts/               # Custom fonts for PDFs
+│
+├── reporting-service/       # New Microservice
+│   ├── src/
+│   │   ├── controllers/     # PDF generation endpoints
+│   │   ├── services/        # PDFMake logic
+│   │   └── routes/
+│   └── fonts/               # Shared fonts
 │
 ├── frontend/
 │   ├── src/

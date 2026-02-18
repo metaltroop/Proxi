@@ -5,6 +5,11 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900;
+    overscroll-behavior-y: none;
+  }
+
+  html {
+    overscroll-behavior-y: none;
   }
 
   /* Better styling for native select elements */

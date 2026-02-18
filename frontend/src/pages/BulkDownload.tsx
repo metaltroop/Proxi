@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { ArrowLeft, Download, CheckSquare, Square, Filter } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { downloadFile } from '../utils/download';
 
 interface Class {
     id: string;
@@ -79,6 +80,8 @@ const BulkDownload: React.FC = () => {
         }
     };
 
+    // ... (inside component)
+
     const handleDownload = async () => {
         if (selectedClasses.size === 0 && selectedTeachers.size === 0) {
             alert('Please select at least one item');
@@ -90,24 +93,14 @@ const BulkDownload: React.FC = () => {
             const response = await api.post('/timetables/download-bulk-pdf', {
                 classIds: Array.from(selectedClasses),
                 teacherIds: Array.from(selectedTeachers)
-            }, {
-                responseType: 'blob'
             });
 
-            // Create blob link to download
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'bulk_timetables.pdf');
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            // Pass response.data directly (contains { pdfBase64: "..." })
+            await downloadFile(response.data, 'bulk_timetables.pdf', 'application/pdf');
 
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         } catch (error) {
             console.error('Download failed:', error);
-            alert('Failed to download PDF');
+            // Error handled by utility or api interceptor
         } finally {
             setDownloading(false);
         }
@@ -148,8 +141,8 @@ const BulkDownload: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('classes')}
                             className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors ${activeTab === 'classes'
-                                    ? 'bg-primary-600 text-white shadow-md'
-                                    : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border')
+                                ? 'bg-primary-600 text-white shadow-md'
+                                : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border')
                                 }`}
                         >
                             <span className="font-medium">Classes</span>
@@ -162,8 +155,8 @@ const BulkDownload: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('teachers')}
                             className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors ${activeTab === 'teachers'
-                                    ? 'bg-primary-600 text-white shadow-md'
-                                    : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border')
+                                ? 'bg-primary-600 text-white shadow-md'
+                                : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border')
                                 }`}
                         >
                             <span className="font-medium">Teachers</span>
@@ -242,8 +235,8 @@ const BulkDownload: React.FC = () => {
                                                 key={item.id}
                                                 onClick={() => toggleSelection(item.id, activeTab)}
                                                 className={`p-3 rounded-lg border cursor-pointer transition-all ${isSelected
-                                                        ? (isDarkMode ? 'bg-primary-900/30 border-primary-500' : 'bg-primary-50 border-primary-200')
-                                                        : (isDarkMode ? 'bg-gray-700/30 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:border-primary-300 hover:shadow-sm')
+                                                    ? (isDarkMode ? 'bg-primary-900/30 border-primary-500' : 'bg-primary-50 border-primary-200')
+                                                    : (isDarkMode ? 'bg-gray-700/30 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:border-primary-300 hover:shadow-sm')
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3">

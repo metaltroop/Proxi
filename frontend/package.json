@@ -11,9 +11,13 @@
     "host": "vite --host"
   },
   "dependencies": {
+    "@capacitor-community/file-opener": "^8.0.0",
     "@capacitor/android": "^8.1.0",
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/keyboard": "^8.0.0",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.554.0",

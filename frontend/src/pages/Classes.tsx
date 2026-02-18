@@ -500,7 +500,7 @@ const Classes: React.FC = () => {
 
             {/* Bulk Create Modal */}
             {showBulkModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4">
                     <div className={`rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                         <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Bulk Create Classes</h2>
@@ -600,7 +600,7 @@ const Classes: React.FC = () => {
 
             {/* Edit Class Modal */}
             {showEditModal && editingClass && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4">
                     <div className={`rounded-xl shadow-2xl max-w-md w-full ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                         <div className={`border-b px-6 py-4 flex items-center justify-between ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                             <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Edit {editingClass.className}</h2>

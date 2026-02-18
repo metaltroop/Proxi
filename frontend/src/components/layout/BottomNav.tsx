@@ -10,9 +10,25 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import MobileMenu from './MobileMenu';
 
+import { Keyboard } from '@capacitor/keyboard';
+import { Capacitor } from '@capacitor/core';
+import { haptics } from '../../utils/haptics';
+
 const BottomNav: React.FC = () => {
     const { isDarkMode } = useTheme();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    React.useEffect(() => {
+        if (Capacitor.isNativePlatform()) {
+            Keyboard.addListener('keyboardWillShow', () => setIsKeyboardOpen(true));
+            Keyboard.addListener('keyboardWillHide', () => setIsKeyboardOpen(false));
+
+            return () => {
+                Keyboard.removeAllListeners();
+            };
+        }
+    }, []);
 
     const menuItems = [
         { path: '/', label: 'Home', icon: LayoutDashboard },
@@ -20,6 +36,8 @@ const BottomNav: React.FC = () => {
         { path: '/timetables', label: 'Timetables', icon: Calendar },
         { path: '/proxies', label: 'Proxies', icon: UserPlus },
     ];
+
+    if (isKeyboardOpen) return null;
 
     return (
         <>
@@ -30,6 +48,7 @@ const BottomNav: React.FC = () => {
                             key={item.path}
                             to={item.path}
                             end={item.path === '/'}
+                            onClick={() => haptics.light()}
                             className={({ isActive }) =>
                                 `flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive
                                     ? 'text-primary-600'
@@ -44,7 +63,10 @@ const BottomNav: React.FC = () => {
 
                     {/* More Button */}
                     <button
-                        onClick={() => setShowMobileMenu(true)}
+                        onClick={() => {
+                            setShowMobileMenu(true);
+                            haptics.light();
+                        }}
                         className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
                     >
                         <MoreHorizontal className="w-6 h-6" />

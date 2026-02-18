@@ -5,6 +5,7 @@ import { Calendar, Save, X, Plus, Edit, Check, Download, ChevronDown, ChevronUp 
 import Autocomplete from '../components/Autocomplete';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
+import { downloadFile } from '../utils/download';
 
 interface Class {
     id: string;
@@ -325,33 +326,23 @@ const Timetables: React.FC = () => {
             const response = await api.get('/timetables/download-pdf', {
                 params: searchType === 'class'
                     ? { classId: selectedId }
-                    : { teacherId: selectedId },
-                responseType: 'blob'
+                    : { teacherId: selectedId }
+                // responseType: 'json' (default)
             });
 
-            // Create blob link to download
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-
-            // Extract filename from Content-Disposition header
-            const contentDisposition = response.headers['content-disposition'];
+            // Extract filename (optional, or just use default)
             let fileName = 'timetable.pdf';
-            if (contentDisposition) {
-                const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                if (fileNameMatch && fileNameMatch[1]) {
-                    fileName = fileNameMatch[1].replace(/['"]/g, '');
-                }
+            // We can't easily get Content-Disposition from JSON response unless sent in body, 
+            // but for now we'll just use a generic name or generate one based on state
+            if (searchType === 'class') {
+                const cls = classes.find(c => c.id === selectedId);
+                if (cls) fileName = `timetable_${cls.className}.pdf`;
+            } else {
+                const teacher = teachers.find(t => t.id === selectedId);
+                if (teacher) fileName = `timetable_${teacher.name}.pdf`;
             }
 
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-
-            // Delay revocation to ensure download starts
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            await downloadFile(response.data, fileName, 'application/pdf');
         } catch (error) {
             console.error('Download PDF error:', error);
             alert('Failed to download PDF');

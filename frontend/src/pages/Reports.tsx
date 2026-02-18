@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Calendar, Download, TrendingUp, UserX, Award } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { downloadFile } from '../utils/download';
 
 interface ProxyReport {
     id: string;
@@ -74,30 +75,22 @@ const Reports: React.FC = () => {
     };
 
     const handleDownloadPdf = async () => {
-        if (downloadingPdf) return; // Prevent multiple clicks
+        if (downloadingPdf) return;
 
         setDownloadingPdf(true);
         try {
             const response = await api.get('/reports/proxies/download-pdf', {
-                params: { startDate, endDate },
-                responseType: 'blob'
+                params: { startDate, endDate }
+                // responseType: 'json' (default)
             });
 
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
             const filename = `proxy_report_${startDate}_to_${endDate}.pdf`;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            // Pass response.data directly (contains { pdfBase64: "..." })
+            await downloadFile(response.data, filename, 'application/pdf');
 
-            // Delay revocation to ensure download starts
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         } catch (error) {
             console.error('Download PDF error:', error);
-            alert('Failed to download PDF');
+            // Alert handled in downloadFile for native, api interceptor for network
         } finally {
             setDownloadingPdf(false);
         }

@@ -4,6 +4,7 @@ import api from '../services/api';
 import { Plus, Search, Edit2, Trash2, LayoutGrid, Table as TableIcon, RefreshCw, X, Calendar } from 'lucide-react';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
+import { haptics } from '../utils/haptics';
 
 interface Teacher {
     id: string;
@@ -157,7 +158,10 @@ const Teachers: React.FC = () => {
     };
 
     const handleSaveTeacher = async () => {
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            haptics.error();
+            return;
+        }
 
         setSaving(true);
         try {
@@ -166,23 +170,27 @@ const Teachers: React.FC = () => {
             } else {
                 await api.post('/teachers', formData);
             }
+            haptics.success();
             setShowModal(false);
             fetchTeachers();
         } catch (error: any) {
             alert(error.response?.data?.error || 'Failed to save teacher');
+            haptics.error();
         } finally {
             setSaving(false);
         }
     };
 
     const handleDeleteTeacher = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this teacher?')) return;
+        if (!window.confirm('Are you sure you want to delete this teacher?')) return;
 
         try {
             await api.delete(`/teachers/${id}`);
+            haptics.success();
             fetchTeachers();
         } catch (error: any) {
             alert(error.response?.data?.error || 'Failed to delete teacher');
+            haptics.error();
         }
     };
 
@@ -566,7 +574,7 @@ const Teachers: React.FC = () => {
 
                 {/* Create/Edit Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4">
                         <div className={`rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                 <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>

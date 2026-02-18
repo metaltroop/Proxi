@@ -16,10 +16,15 @@ const api = axios.create({
     }
 });
 
+import { haptics } from '../utils/haptics';
+
+// ... (existing code)
+
 // Response interceptor for error handling
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        haptics.error(); // Vibrate on error
         if (error.response?.status === 401) {
             // Only redirect to login if not already on login page
             if (!window.location.pathname.includes('/login')) {
