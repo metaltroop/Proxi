@@ -34,10 +34,11 @@ router.post('/login', async (req, res) => {
             name: user.name
         }, process.env.JWT_SECRET, { expiresIn: '7d' });
         // Set cookie
+        const isProduction = process.env.NODE_ENV === 'production';
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: isProduction, // Always required for SameSite=None
+            sameSite: isProduction ? 'none' : 'lax', // Allow cross-site in production (e.g. localhost -> render)
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
         res.json({
