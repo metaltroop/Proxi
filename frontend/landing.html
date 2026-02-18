@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxi - Smart School Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-bold text-2xl text-blue-600">Proxi</span>
+                </div>
+                <!-- Links -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-slate-600 hover:text-blue-600 transition-colors">Features</a>
+                    <a href="#download" class="text-slate-600 hover:text-blue-600 transition-colors">Download</a>
+                    <a href="/login" class="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div
+                class="absolute -top-40 -right-40 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob">
+            </div>
+            <div
+                class="absolute top-20 -left-20 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000">
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 fade-in">
+                Smart Proxy <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Management</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-600 mb-10 max-w-3xl mx-auto fade-in"
+                style="transition-delay: 100ms;">
+                Streamline school operations with intelligent substitution management, automated reporting, and
+                real-time updates.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="transition-delay: 200ms;">
+                <a href="https://github.com/metaltroop/Proxi/releases/download/v0.1/Proxi.apk"
+                    class="px-8 py-4 bg-blue-600 text-white rounded-full font-semibold shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                    Download Android App
+                </a>
+                <a href="https://proxi.metaltroop.cv/login"
+                    class="px-8 py-4 bg-white text-blue-600 border border-blue-200 rounded-full font-semibold shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
+                    Web Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-3xl font-bold text-slate-900">Powerful Modules</h2>
+                <p class="mt-4 text-slate-600">Everything you need to manage school substitutions effectively.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div
+                    class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow fade-in">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Auto-Assignment</h3>
+                    <p class="text-slate-600">Intelligent algorithms automatically suggest the best available teachers
+                        for substitution based on workload and subject expertise.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow fade-in"
+                    style="transition-delay: 100ms;">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Instant Reports</h3>
+                    <p class="text-slate-600">Generate comprehensive monthly and weekly reports on proxies, teacher
+                        workload, and absenteeism with a single click.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow fade-in"
+                    style="transition-delay: 200ms;">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Mobile App</h3>
+                    <p class="text-slate-600">Teachers created specifically for Android to manage their schedules and
+                        view assigned proxies on the go.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 to-blue-900 opacity-90">
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-8 fade-in">Get Proxi for Android</h2>
+            <p class="text-lg text-slate-300 mb-10 fade-in">Experience the full power of Proxi on your mobile device.
+                Download the APK directly and install it to get started.</p>
+
+            <div class="p-8 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 inline-block fade-in">
+                <div class="flex flex-col items-center">
+                    <svg class="w-16 h-16 text-green-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M17.523 15.3414C17.523 15.3414 17.5605 15.3414 17.5982 15.304C18.2368 14.6322 18.2368 13.548 17.5982 12.9126L15.304 10.5891C14.6654 9.95368 13.6133 9.95368 12.9748 10.5891C12.3736 11.2246 12.336 12.1966 12.8622 12.8378L14.7032 14.6676L3.99648 14.6676C3.09405 14.6676 2.38086 15.4151 2.38086 16.3129C2.38086 17.2106 3.09405 17.9582 3.99648 17.9582L14.7032 17.9582L12.8622 19.788C12.336 20.4292 12.3736 21.4012 12.9748 22.0366C13.6133 22.6721 14.6654 22.6721 15.304 22.0366L17.5982 19.7131C18.2368 19.0776 18.2368 17.9934 17.5982 17.3216C17.5605 17.2842 17.523 17.2842 17.523 17.2842L15.4168 15.1544L17.523 15.3414ZM12.0001 2.91577L12.0001 6.2063C12.0001 7.10403 12.7133 7.8516 13.6158 7.8516C14.5182 7.8516 15.2314 7.10403 15.2314 6.2063L15.2314 2.91577C15.2314 2.01804 14.5182 1.27051 13.6158 1.27051C12.7133 1.27051 12.0001 2.01804 12.0001 2.91577Z" />
+                    </svg>
+                    <span class="text-sm text-slate-400 mb-2">Latest Version: v1.0.0</span>
+
+                    <!-- INSERT APK LINK HERE -->
+                    <a href="https://github.com/metaltroop/Proxi/releases/download/v0.1/Proxi.apk" id="download-link"
+                        class="px-8 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download APK
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 py-10 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500">
+            <p>&copy; 2026 Proxi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar Scrolled State
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('glass', 'shadow-sm');
+                nav.classList.remove('bg-transparent');
+            } else {
+                nav.classList.remove('glass', 'shadow-sm');
+                nav.classList.add('bg-transparent');
+            }
+        });
+
+        // Intersection Observer for Fade-in Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

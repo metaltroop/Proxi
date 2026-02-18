@@ -192,11 +192,13 @@ router.get('/proxies/download-pdf', async (req, res) => {
         });
         // Generate PDF
         const pdfBuffer = await (0, reportingClient_1.getProxyReportPdf)(proxies, startDate || new Date().toISOString().split('T')[0], endDate || new Date().toISOString().split('T')[0]);
-        // Set response headers
-        const filename = `proxy_report_${startDate || 'all'}_to_${endDate || 'all'}.pdf`;
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        res.send(pdfBuffer);
+        // Convert to Base64
+        const pdfBase64 = pdfBuffer.toString('base64');
+        // Send as JSON
+        res.json({
+            pdfBase64,
+            filename: `proxy_report_${startDate || 'all'}_to_${endDate || 'all'}.pdf`
+        });
     }
     catch (error) {
         console.error('Error generating PDF:', error);
