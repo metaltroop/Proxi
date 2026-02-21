@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from 'react-hot-toast';
+import { Capacitor } from '@capacitor/core';
 
 // Pages
 import Login from './pages/auth/Login';
@@ -16,11 +18,12 @@ import BulkDownload from './pages/BulkDownload';
 import Proxies from './pages/Proxies';
 import Reports from './pages/Reports';
 import Records from './pages/Records';
-import Landing from './pages/Landing';
+import LandingPage from './pages/LandingPage';
 
 // Layout
 import DashboardLayout from './components/layout/DashboardLayout';
 import ScrollToTop from './components/ScrollToTop';
+import BackButtonHandler from './components/BackButtonHandler';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -39,18 +42,24 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/landing" element={<Landing />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route
         path="/"
+        element={
+          Capacitor.isNativePlatform() ? <Navigate to="/dashboard" replace /> : <LandingPage />
+        }
+      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      {/* Protected Routes */}
+      <Route
         element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="teachers" element={<Teachers />} />
         <Route path="classes" element={<Classes />} />
         <Route path="subjects" element={<Subjects />} />
@@ -71,6 +80,8 @@ function App() {
       <ThemeProvider>
         <BrowserRouter>
           <ScrollToTop />
+          <BackButtonHandler />
+          <Toaster position="top-right" />
           <AppRoutes />
         </BrowserRouter>
       </ThemeProvider>

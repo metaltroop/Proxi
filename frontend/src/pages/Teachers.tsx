@@ -5,6 +5,7 @@ import { Plus, Search, Edit2, Trash2, LayoutGrid, Table as TableIcon, RefreshCw,
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
 import { haptics } from '../utils/haptics';
+import { toast } from 'react-hot-toast';
 
 interface Teacher {
     id: string;
@@ -174,7 +175,7 @@ const Teachers: React.FC = () => {
             setShowModal(false);
             fetchTeachers();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to save teacher');
+            toast.error(error.response?.data?.error || 'Failed to save teacher');
             haptics.error();
         } finally {
             setSaving(false);
@@ -189,7 +190,7 @@ const Teachers: React.FC = () => {
             haptics.success();
             fetchTeachers();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete teacher');
+            toast.error(error.response?.data?.error || 'Failed to delete teacher');
             haptics.error();
         }
     };

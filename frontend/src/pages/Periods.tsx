@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Plus, Edit2, Trash2, X, Save, RefreshCw, Clock, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 interface Period {
     id: string;
@@ -64,7 +65,7 @@ const Periods: React.FC = () => {
 
     const handleSave = async () => {
         if ((!formData.periodNo && formData.periodType === 'CLASS') || !formData.startTime || !formData.endTime) {
-            alert('All fields are required');
+            toast.error('All fields are required');
             return;
         }
 
@@ -84,7 +85,7 @@ const Periods: React.FC = () => {
             setShowModal(false);
             fetchPeriods();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to save period');
+            toast.error(error.response?.data?.error || 'Failed to save period');
         }
     };
 
@@ -95,7 +96,7 @@ const Periods: React.FC = () => {
             await api.delete(`/periods/${id}`);
             fetchPeriods();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete period');
+            toast.error(error.response?.data?.error || 'Failed to delete period');
         }
     };
 

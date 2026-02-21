@@ -2,6 +2,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { Capacitor } from '@capacitor/core';
 import { haptics } from './haptics';
+import { toast } from 'react-hot-toast';
 
 // Helper to get Base64 string from various input types
 const getDataAsBase64 = async (input: any): Promise<string> => {
@@ -119,7 +120,7 @@ export const downloadFile = async (data: any, filename: string, mimeType: string
                 });
             } catch (openError) {
                 console.error('Error opening file:', openError);
-                alert(`File saved but could not be opened.\nLocation: ${fileUri}`);
+                toast.error(`File saved but could not be opened.\nLocation: ${fileUri}`);
             }
 
             return fileUri;
@@ -138,7 +139,7 @@ export const downloadFile = async (data: any, filename: string, mimeType: string
     } catch (error: any) {
         console.error('Download error:', error);
         haptics.error();
-        alert(`Download failed: ${error.message || JSON.stringify(error)}`);
+        toast.error(`Download failed: ${error.message || JSON.stringify(error)}`);
         throw error;
     }
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Plus, Edit2, Trash2, X, Save, RefreshCw, Search, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 interface Subject {
     id: string;
@@ -62,7 +63,7 @@ const Subjects: React.FC = () => {
 
     const handleSave = async () => {
         if (!formData.subjectName || !formData.shortCode) {
-            alert('Subject name and short code are required');
+            toast.error('Subject name and short code are required');
             return;
         }
 
@@ -75,7 +76,7 @@ const Subjects: React.FC = () => {
             setShowModal(false);
             fetchSubjects();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to save subject');
+            toast.error(error.response?.data?.error || 'Failed to save subject');
         }
     };
 
@@ -86,7 +87,7 @@ const Subjects: React.FC = () => {
             await api.delete(`/subjects/${id}`);
             fetchSubjects();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete subject');
+            toast.error(error.response?.data?.error || 'Failed to delete subject');
         }
     };
 

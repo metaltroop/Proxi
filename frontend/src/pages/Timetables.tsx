@@ -6,6 +6,7 @@ import Autocomplete from '../components/Autocomplete';
 import Dropdown from '../components/Dropdown';
 import { useTheme } from '../context/ThemeContext';
 import { downloadFile } from '../utils/download';
+import { toast } from 'react-hot-toast';
 
 interface Class {
     id: string;
@@ -214,15 +215,15 @@ const Timetables: React.FC = () => {
 
     const handleAddAssignments = () => {
         if (!bulkSubjectId) {
-            alert('Please select a subject');
+            toast.error('Please select a subject');
             return;
         }
         if (searchType === 'teacher' && !bulkClassId) {
-            alert('Please select a class');
+            toast.error('Please select a class');
             return;
         }
         if (searchType === 'class' && !bulkTeacherId) {
-            alert('Please select a teacher');
+            toast.error('Please select a teacher');
             return;
         }
         const newAssignments: TempAssignment[] = [];
@@ -245,7 +246,7 @@ const Timetables: React.FC = () => {
 
     const handleSaveAll = async () => {
         if (tempAssignments.length === 0 && pendingDeletions.length === 0) {
-            alert('No changes to save');
+            toast.error('No changes to save');
             return;
         }
         try {
@@ -269,10 +270,10 @@ const Timetables: React.FC = () => {
             setPendingDeletions([]);
             setIsEditing(false);
             checkAndFetchTimetable();
-            alert('Timetable saved successfully!');
+            toast.success('Timetable saved successfully!');
         } catch (error: any) {
             console.error('Save error:', error);
-            alert(error.response?.data?.error || 'Failed to save timetable');
+            toast.error(error.response?.data?.error || 'Failed to save timetable');
         }
     };
 
@@ -345,7 +346,7 @@ const Timetables: React.FC = () => {
             await downloadFile(response.data, fileName, 'application/pdf');
         } catch (error) {
             console.error('Download PDF error:', error);
-            alert('Failed to download PDF');
+            toast.error('Failed to download PDF');
         } finally {
             setDownloadingPdf(false);
         }

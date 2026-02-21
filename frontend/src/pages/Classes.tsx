@@ -4,6 +4,7 @@ import api from '../services/api';
 import { Plus, Edit2, Trash2, X, Save, Users, Search, RefreshCw, LayoutGrid, Table as TableIcon, Calendar, Filter } from 'lucide-react';
 import Autocomplete from '../components/Autocomplete';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 interface Class {
     id: string;
@@ -81,7 +82,7 @@ const Classes: React.FC = () => {
 
     const handleBulkCreate = async () => {
         if (selectedStandards.length === 0 || divisions.length === 0) {
-            alert('Please select at least one standard and one division');
+            toast.error('Please select at least one standard and one division');
             return;
         }
 
@@ -95,7 +96,7 @@ const Classes: React.FC = () => {
             setShowAllPreview(false);
             fetchClasses();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to create classes');
+            toast.error(error.response?.data?.error || 'Failed to create classes');
         }
     };
 
@@ -119,7 +120,7 @@ const Classes: React.FC = () => {
             setShowEditModal(false);
             fetchClasses();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to update class');
+            toast.error(error.response?.data?.error || 'Failed to update class');
         }
     };
 
@@ -130,7 +131,7 @@ const Classes: React.FC = () => {
             await api.delete(`/classes/${id}`);
             fetchClasses();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete class');
+            toast.error(error.response?.data?.error || 'Failed to delete class');
         }
     };
 

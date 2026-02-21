@@ -4,6 +4,7 @@ import api from '../services/api';
 import { ArrowLeft, Download, CheckSquare, Square, Filter } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { downloadFile } from '../utils/download';
+import { toast } from 'react-hot-toast';
 
 interface Class {
     id: string;
@@ -84,7 +85,7 @@ const BulkDownload: React.FC = () => {
 
     const handleDownload = async () => {
         if (selectedClasses.size === 0 && selectedTeachers.size === 0) {
-            alert('Please select at least one item');
+            toast.error('Please select at least one item');
             return;
         }
 

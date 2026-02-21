@@ -3,6 +3,7 @@ import api from '../services/api';
 import { Calendar, Save, X, Check, LayoutGrid, Table as TableIcon, Trash2, UserPlus } from 'lucide-react';
 import Autocomplete from '../components/Autocomplete';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 interface Teacher {
     id: string;
@@ -96,7 +97,7 @@ const Proxies: React.FC = () => {
             setAvailableTeachersMap({});
         } catch (error) {
             console.error('Failed to fetch teacher schedule:', error);
-            alert('Failed to load teacher schedule');
+            toast.error('Failed to load teacher schedule');
         } finally {
             setFetchingSchedule(false);
         }
@@ -136,13 +137,13 @@ const Proxies: React.FC = () => {
         // Find the period to check if it has passed
         const period = teacherSchedule.find(p => p.periodId === periodId);
         if (period && isPeriodPast(period.endTime)) {
-            alert('Cannot assign proxy for a period that has already passed.');
+            toast.error('Cannot assign proxy for a period that has already passed.');
             return;
         }
 
         // Don't allow selecting if there's an existing proxy (must delete first)
         if (existingAssignments.some(p => p.periodId === periodId)) {
-            alert('Please delete the existing proxy assignment before creating a new one.');
+            toast.error('Please delete the existing proxy assignment before creating a new one.');
             return;
         }
 
@@ -224,7 +225,7 @@ const Proxies: React.FC = () => {
             setExistingAssignments(prev => prev.filter(p => p.id !== proxyId));
         } catch (error) {
             console.error('Failed to delete proxy:', error);
-            alert('Failed to delete proxy assignment');
+            toast.error('Failed to delete proxy assignment');
         } finally {
             setDeletingId(null);
         }
@@ -232,12 +233,12 @@ const Proxies: React.FC = () => {
 
     const handleSaveAll = async () => {
         if (tempAssignments.length === 0) {
-            alert('No proxy assignments to save');
+            toast.error('No proxy assignments to save');
             return;
         }
 
         if (!teacherStatus) {
-            alert('Please select a teacher status');
+            toast.error('Please select a teacher status');
             return;
         }
 
@@ -251,12 +252,12 @@ const Proxies: React.FC = () => {
                 createdBy: 'admin' // TODO: Get from auth context
             });
 
-            alert('Proxy assignments saved successfully!');
+            toast.success('Proxy assignments saved successfully!');
             // Reload schedule to refresh existing assignments
             handleLoadSchedule();
         } catch (error: any) {
             console.error('Save error:', error);
-            alert(error.response?.data?.error || 'Failed to save proxy assignments');
+            toast.error(error.response?.data?.error || 'Failed to save proxy assignments');
         } finally {
             setSaving(false);
         }
@@ -566,7 +567,7 @@ const Proxies: React.FC = () => {
                                                             sublabel: `${t.currentLoad} classes`
                                                         }))}
                                                         value=""
-                                                        onChange={(teacherId) => handleProxySelect(entry.periodId, teacherId)}
+                                                        onChange={(teacherId: string) => handleProxySelect(entry.periodId, teacherId)}
                                                         onSearch={() => { }} // No search needed, already filtered
                                                         placeholder="Select teacher..."
                                                         locked={false}

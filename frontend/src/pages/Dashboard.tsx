@@ -3,10 +3,11 @@ import api from '../services/api';
 import { Users, UserX, UserPlus, Activity, Calendar, Clock, ArrowRight, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { PRESET_ANIMATIONS } from '../utils/animations';
+
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import AnimatedToggle from '../components/AnimatedToggle';
+
 
 interface DashboardStats {
     totalTeachers: number;
@@ -33,6 +34,15 @@ const Dashboard: React.FC = () => {
             setStats(response.data);
         } catch (error) {
             console.error('Failed to fetch stats:', error);
+            // Set empty stats structure to prevent blank screen
+            setStats({
+                totalTeachers: 0,
+                teachersAbsentToday: 0,
+                proxiesAssignedToday: 0,
+                proxyTrends: [],
+                teacherAvailability: [],
+                recentProxies: []
+            });
         } finally {
             setLoading(false);
         }
@@ -59,9 +69,9 @@ const Dashboard: React.FC = () => {
         <>
             {/* Stats Cards */}
             <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${activeTab === 'overview' ? 'block' : 'hidden md:grid'}`}>
-                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-100 ${isDarkMode
-                        ? 'bg-gradient-to-br from-blue-900 to-blue-950 border-blue-800'
-                        : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 delay-100 ${isDarkMode
+                    ? 'bg-gradient-to-br from-blue-900 to-blue-950 border-blue-800'
+                    : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'
                     } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
@@ -75,9 +85,9 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-200 ${isDarkMode
-                        ? 'bg-gradient-to-br from-red-900 to-red-950 border-red-800'
-                        : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200'
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 delay-200 ${isDarkMode
+                    ? 'bg-gradient-to-br from-red-900 to-red-950 border-red-800'
+                    : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200'
                     } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
@@ -91,9 +101,9 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 ${PRESET_ANIMATIONS.scaleIn} delay-300 ${isDarkMode
-                        ? 'bg-gradient-to-br from-green-900 to-green-950 border-green-800'
-                        : 'bg-gradient-to-br from-green-50 to-green-100 border-green-200'
+                <div className={`rounded-xl p-6 shadow-sm border transition-all duration-300 delay-300 ${isDarkMode
+                    ? 'bg-gradient-to-br from-green-900 to-green-950 border-green-800'
+                    : 'bg-gradient-to-br from-green-50 to-green-100 border-green-200'
                     } hover:shadow-lg`}>
                     <div className="flex items-center justify-between">
                         <div>
@@ -111,7 +121,7 @@ const Dashboard: React.FC = () => {
             {/* Recent Activity & Quick Actions */}
             <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${activeTab === 'overview' ? 'block' : 'hidden md:grid'}`}>
                 {/* Recent Activity */}
-                <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-500 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                     }`}>
                     <div className="flex items-center justify-between mb-6">
                         <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Assignments</h2>
@@ -127,8 +137,8 @@ const Dashboard: React.FC = () => {
                                 <div
                                     key={proxy.id}
                                     className={`flex items-center justify-between p-4 rounded-xl transition-colors border ${isDarkMode
-                                            ? 'bg-gray-700/50 border-gray-700 hover:bg-gray-700'
-                                            : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
+                                        ? 'bg-gray-700/50 border-gray-700 hover:bg-gray-700'
+                                        : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
@@ -168,7 +178,7 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Quick Actions */}
-                <div className={`h-fit rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-600 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                <div className={`h-fit rounded-xl p-6 shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                     }`}>
                     <h2 className={`text-lg font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h2>
                     <div className="space-y-3">
@@ -177,15 +187,15 @@ const Dashboard: React.FC = () => {
                             Assign Proxy
                         </Link>
                         <Link to="/teachers" className={`w-full btn flex items-center justify-center gap-2 py-3 border ${isDarkMode
-                                ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
-                                : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
+                            ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
+                            : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
                             }`}>
                             <Plus className="w-5 h-5" />
                             Add Teacher
                         </Link>
                         <Link to="/timetables" className={`w-full btn flex items-center justify-center gap-2 py-3 border ${isDarkMode
-                                ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
-                                : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
+                            ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200'
+                            : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
                             }`}>
                             <Calendar className="w-5 h-5" />
                             View Timetables
@@ -199,7 +209,7 @@ const Dashboard: React.FC = () => {
     const renderCharts = () => (
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${activeTab === 'analytics' ? 'block' : 'hidden md:grid'}`}>
             {/* Proxy Trends */}
-            <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-300 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            <div className={`lg:col-span-2 rounded-xl p-6 shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                 }`}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className={`text-lg font-bold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -245,7 +255,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Teacher Availability */}
-            <div className={`rounded-xl p-6 shadow-sm border ${PRESET_ANIMATIONS.slideInUp} delay-400 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            <div className={`rounded-xl p-6 shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                 }`}>
                 <h2 className={`text-lg font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Teacher Availability</h2>
                 <div className="h-64 w-full relative">
@@ -296,7 +306,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className={`p-4 md:p-8 space-y-8 pb-32 md:pb-8 min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             {/* Header */}
-            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${PRESET_ANIMATIONS.slideInRight}`}>
+            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4`}>
                 <div>
                     <h1 className={`text-3xl font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dashboard</h1>
                     <p className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>

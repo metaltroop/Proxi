@@ -25,7 +25,7 @@ const Sidebar: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const menuItems = [
-        { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+        { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/teachers', label: 'Teachers', icon: Users },
         { path: '/classes', label: 'Classes', icon: School },
         { path: '/subjects', label: 'Subjects', icon: BookOpen },
@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        end={item.path === '/'}
+                        end={item.path === '/dashboard'}
                         title={isCollapsed ? item.label : ''}
                         className={({ isActive }) =>
                             `flex items-center gap-3 px-4 py-3 rounded-lg transition-all whitespace-nowrap ${isActive

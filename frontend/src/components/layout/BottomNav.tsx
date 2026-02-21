@@ -31,7 +31,7 @@ const BottomNav: React.FC = () => {
     }, []);
 
     const menuItems = [
-        { path: '/', label: 'Home', icon: LayoutDashboard },
+        { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/teachers', label: 'Teachers', icon: Users },
         { path: '/timetables', label: 'Timetables', icon: Calendar },
         { path: '/proxies', label: 'Proxies', icon: UserPlus },
@@ -47,7 +47,7 @@ const BottomNav: React.FC = () => {
                         <NavLink
                             key={item.path}
                             to={item.path}
-                            end={item.path === '/'}
+                            end={item.path === '/dashboard'}
                             onClick={() => haptics.light()}
                             className={({ isActive }) =>
                                 `flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive
