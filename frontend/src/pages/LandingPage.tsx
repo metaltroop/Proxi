@@ -26,7 +26,7 @@ const LandingPage: React.FC = () => {
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        document.querySelectorAll('.landing-fade-in').forEach(el => observer.observe(el));
 
         return () => observer.disconnect();
     }, []);
@@ -63,14 +63,14 @@ const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 fade-in opacity-0 translate-y-8 transition-all duration-700">
+                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 landing-fade-in opacity-0 translate-y-8 transition-all duration-700">
                         Smart Proxy <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Management System</span>
                     </h1>
-                    <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed fade-in opacity-0 translate-y-8 transition-all duration-700 delay-100">
+                    <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed landing-fade-in opacity-0 translate-y-8 transition-all duration-700 delay-100">
                         Streamline school operations with intelligent substitution management, automated reporting, and real-time updates.
                     </p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4 fade-in opacity-0 translate-y-8 transition-all duration-700 delay-200">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 landing-fade-in opacity-0 translate-y-8 transition-all duration-700 delay-200">
                         <a href="#download" className="px-8 py-4 bg-blue-600 text-white rounded-full font-bold shadow-lg hover:bg-blue-700 hover:shadow-blue-500/30 transition-all transform hover:-translate-y-1">
                             Download Android App
                         </a>
@@ -90,7 +90,7 @@ const LandingPage: React.FC = () => {
             {/* Features Section */}
             <section id="features" className="py-24 bg-white relative">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20 fade-in opacity-0 translate-y-8 transition-all duration-700">
+                    <div className="text-center mb-20 landing-fade-in opacity-0 translate-y-8 transition-all duration-700">
                         <h2 className="text-4xl font-bold text-slate-900 mb-4">Powerful Features</h2>
                         <p className="text-lg text-slate-600 max-w-2xl mx-auto">Everything you need to manage school substitutions effectively, all in one place.</p>
                     </div>
@@ -134,12 +134,12 @@ const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-8 fade-in opacity-0 translate-y-8 transition-all duration-700">Get Proxi for Android</h2>
-                    <p className="text-xl text-slate-300 mb-12 fade-in opacity-0 translate-y-8 transition-all duration-700 max-w-2xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-8 landing-fade-in opacity-0 translate-y-8 transition-all duration-700">Get Proxi for Android</h2>
+                    <p className="text-xl text-slate-300 mb-12 landing-fade-in opacity-0 translate-y-8 transition-all duration-700 max-w-2xl mx-auto">
                         Experience the full power of Proxi on your mobile device. Download the APK directly and install it to get started.
                     </p>
 
-                    <div className="p-10 rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 inline-block fade-in opacity-0 translate-y-8 transition-all duration-700 shadow-2xl shadow-black/20">
+                    <div className="p-10 rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 inline-block landing-fade-in opacity-0 translate-y-8 transition-all duration-700 shadow-2xl shadow-black/20">
                         <div className="flex flex-col items-center">
 
                             <div className="bg-white rounded-3xl mb-6 h-32 w-32 flex items-center justify-center shadow-xl shadow-green-500/20 ring-4 ring-white/10">
