@@ -9,6 +9,133 @@ const auth_1 = require("../middleware/auth");
 const client_1 = require("@prisma/client");
 const errorHandler_1 = require("../utils/errorHandler");
 const router = (0, express_1.Router)();
+/**
+ * @swagger
+ * tags:
+ *   name: Classes
+ *   description: Class management and operations
+ */
+/**
+ * @swagger
+ * /classes:
+ *   get:
+ *     summary: Get all classes
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by class name
+ *       - in: query
+ *         name: standard
+ *         schema:
+ *           type: integer
+ *         description: Filter by standard
+ *     responses:
+ *       200:
+ *         description: List of classes
+ *
+ * /classes/{id}:
+ *   get:
+ *     summary: Get a single class
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Class details
+ *   put:
+ *     summary: Update a class
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               className:
+ *                 type: string
+ *               classTeacherId:
+ *                 type: string
+ *               numberOfStudents:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Class updated successfully
+ *   delete:
+ *     summary: Delete a class
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Class deleted successfully
+ *
+ * /classes/bulk:
+ *   post:
+ *     summary: Bulk create classes
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               standards:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *               divisions:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Classes created successfully
+ *
+ * /classes/{id}/timetable:
+ *   get:
+ *     summary: Get class timetable
+ *     tags: [Classes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of timetable entries for the class
+ */
 // Get all classes with filters
 router.get('/', auth_1.authenticate, async (req, res) => {
     try {

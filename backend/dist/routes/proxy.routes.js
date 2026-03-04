@@ -5,6 +5,163 @@ const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 // Day of week mapping
+/**
+ * @swagger
+ * tags:
+ *   name: Proxy
+ *   description: Proxy assignment and availability operations
+ */
+/**
+ * @swagger
+ * /proxy/teacher-schedule:
+ *   get:
+ *     summary: Get teacher's timetable for a specific date
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: teacherId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Teacher schedule and existing proxies
+ *
+ * /proxy/available-teachers:
+ *   get:
+ *     summary: Get available teachers for a period
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: periodId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: excludeTeacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of available teachers sorted by workload
+ *
+ * /proxy/assignments:
+ *   get:
+ *     summary: Get proxy assignments for a teacher on a date
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of proxy assignments
+ *
+ * /proxy/assignments/bulk:
+ *   post:
+ *     summary: Create multiple proxy assignments
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - date
+ *               - absentTeacherId
+ *               - status
+ *               - assignments
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               absentTeacherId:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [ABSENT, BUSY, HALF_DAY]
+ *               assignments:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     periodId:
+ *                       type: string
+ *                     proxyTeacherId:
+ *                       type: string
+ *                     classId:
+ *                       type: string
+ *                     subjectId:
+ *                       type: string
+ *                     remarks:
+ *                       type: string
+ *               createdBy:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Proxy assignments created successfully
+ *
+ * /proxy/assignments/{id}:
+ *   delete:
+ *     summary: Delete a proxy assignment
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Proxy assignment deleted
+ *
+ * /proxy/assignments/date/{date}:
+ *   get:
+ *     summary: Get all proxy assignments for a date
+ *     tags: [Proxy]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: List of proxy assignments for the date
+ */
 // Day of week mapping
 const DAY_TO_ENUM = {
     0: client_1.DayOfWeek.MONDAY,
@@ -156,11 +313,21 @@ router.get('/available-teachers', async (req, res) => {
                     day: dayEnum
                 }
             });
-            // Count proxy assignments for this date
+            // Calculate start and end of the current week (Monday to Saturday)
+            const startOfWeek = new Date(selectedDate);
+            startOfWeek.setDate(selectedDate.getDate() - adjustedDay);
+            startOfWeek.setHours(0, 0, 0, 0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 5);
+            endOfWeek.setHours(23, 59, 59, 999);
+            // Count proxy assignments for this teacher across the entire week
             const proxyCount = await prisma.proxy.count({
                 where: {
                     assignedTeacherId: teacher.id,
-                    date: selectedDate
+                    date: {
+                        gte: startOfWeek,
+                        lte: endOfWeek
+                    }
                 }
             });
             return {

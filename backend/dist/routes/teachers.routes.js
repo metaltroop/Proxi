@@ -8,6 +8,218 @@ const database_1 = __importDefault(require("../config/database"));
 const auth_1 = require("../middleware/auth");
 const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
+/**
+ * @swagger
+ * tags:
+ *   name: Teachers
+ *   description: Teacher management and operations
+ */
+/**
+ * @swagger
+ * /teachers:
+ *   get:
+ *     summary: Get all teachers
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isClassTeacher
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: standard
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: subject
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of teachers
+ *   post:
+ *     summary: Create a new teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               employeeId:
+ *                 type: string
+ *               isClassTeacher:
+ *                 type: boolean
+ *               assignedClassId:
+ *                 type: string
+ *               teachingSubjects:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               joinDate:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Teacher created successfully
+ *
+ * /teachers/{id}:
+ *   get:
+ *     summary: Get a single teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Teacher details
+ *   put:
+ *     summary: Update a teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               employeeId:
+ *                 type: string
+ *               isClassTeacher:
+ *                 type: boolean
+ *               assignedClassId:
+ *                 type: string
+ *               teachingSubjects:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               joinDate:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: Teacher updated successfully
+ *   delete:
+ *     summary: Delete a teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Teacher deleted successfully
+ *
+ * /teachers/{id}/absence:
+ *   put:
+ *     summary: Mark a teacher absent or present for a specific date
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - date
+ *               - isAbsent
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               reason:
+ *                 type: string
+ *               isAbsent:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Absence status updated
+ *
+ * /teachers/{id}/timetable:
+ *   get:
+ *     summary: Get a teacher's timetable
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Teacher timetable details
+ *
+ * /teachers/copy-schedule:
+ *   post:
+ *     summary: Copy a schedule from one teacher to another
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fromTeacherId
+ *               - toTeacherId
+ *             properties:
+ *               fromTeacherId:
+ *                 type: string
+ *               toTeacherId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Schedule copied successfully
+ */
 // Get all teachers with filters
 router.get('/', auth_1.authenticate, async (req, res) => {
     try {

@@ -9,6 +9,117 @@ const auth_1 = require("../middleware/auth");
 const client_1 = require("@prisma/client");
 const errorHandler_1 = require("../utils/errorHandler");
 const router = (0, express_1.Router)();
+/**
+ * @swagger
+ * tags:
+ *   name: Periods
+ *   description: Period structure management
+ */
+/**
+ * @swagger
+ * /periods:
+ *   get:
+ *     summary: Get all periods
+ *     tags: [Periods]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of periods
+ *   post:
+ *     summary: Create a new period
+ *     tags: [Periods]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - periodNo
+ *               - periodType
+ *               - startTime
+ *               - endTime
+ *             properties:
+ *               periodNo:
+ *                 type: integer
+ *               periodType:
+ *                 type: string
+ *                 enum: [REGULAR, BREAK, ASSEMBLY, PTM]
+ *               startTime:
+ *                 type: string
+ *                 format: time
+ *                 example: "08:00"
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *                 example: "08:45"
+ *     responses:
+ *       201:
+ *         description: Period created successfully
+ *
+ * /periods/{id}:
+ *   get:
+ *     summary: Get a single period
+ *     tags: [Periods]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Period details
+ *   put:
+ *     summary: Update a period
+ *     tags: [Periods]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               periodNo:
+ *                 type: integer
+ *               periodType:
+ *                 type: string
+ *                 enum: [REGULAR, BREAK, ASSEMBLY, PTM]
+ *               startTime:
+ *                 type: string
+ *               endTime:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Period updated successfully
+ *   delete:
+ *     summary: Delete a period
+ *     tags: [Periods]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Period deleted successfully
+ */
 // Get all periods
 router.get('/', auth_1.authenticate, async (req, res) => {
     try {

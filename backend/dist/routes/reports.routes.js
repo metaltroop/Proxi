@@ -5,6 +5,90 @@ const client_1 = require("@prisma/client");
 const reportingClient_1 = require("../services/reportingClient");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
+/**
+ * @swagger
+ * tags:
+ *   name: Reports
+ *   description: Reporting, analytics and PDFs
+ */
+/**
+ * @swagger
+ * /reports/proxies:
+ *   get:
+ *     summary: Get proxy assignments with filters
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of filtered proxies
+ *
+ * /reports/stats:
+ *   get:
+ *     summary: Get summary statistics for proxies
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Statistics data
+ *
+ * /reports/proxies/download-pdf:
+ *   get:
+ *     summary: Download proxy report as PDF
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: PDF file stream
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
 // GET /reports/proxies - Get proxy assignments with filters
 router.get('/proxies', async (req, res) => {
     try {
@@ -192,13 +276,11 @@ router.get('/proxies/download-pdf', async (req, res) => {
         });
         // Generate PDF
         const pdfBuffer = await (0, reportingClient_1.getProxyReportPdf)(proxies, startDate || new Date().toISOString().split('T')[0], endDate || new Date().toISOString().split('T')[0]);
-        // Convert to Base64
-        const pdfBase64 = pdfBuffer.toString('base64');
-        // Send as JSON
-        res.json({
-            pdfBase64,
-            filename: `proxy_report_${startDate || 'all'}_to_${endDate || 'all'}.pdf`
-        });
+        // Set response headers
+        const filename = `proxy_report_${startDate || 'all'}_to_${endDate || 'all'}.pdf`;
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(pdfBuffer);
     }
     catch (error) {
         console.error('Error generating PDF:', error);

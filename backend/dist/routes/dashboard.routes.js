@@ -7,6 +7,24 @@ const express_1 = require("express");
 const date_fns_1 = require("date-fns");
 const router = (0, express_1.Router)();
 const database_1 = __importDefault(require("../config/database"));
+/**
+ * @swagger
+ * tags:
+ *   name: Dashboard
+ *   description: Dashboard statistics and overviews
+ */
+/**
+ * @swagger
+ * /dashboard/stats:
+ *   get:
+ *     summary: Get comprehensive dashboard statistics
+ *     tags: [Dashboard]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contains teacher counts, absence rates, and proxy trends
+ */
 router.get('/stats', async (req, res) => {
     try {
         const today = new Date();

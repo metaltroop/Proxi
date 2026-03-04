@@ -19,6 +19,9 @@ const timetables_routes_1 = __importDefault(require("./routes/timetables.routes"
 const proxy_routes_1 = __importDefault(require("./routes/proxy.routes"));
 const reports_routes_1 = __importDefault(require("./routes/reports.routes"));
 const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"));
+// Import Swagger
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const swagger_1 = __importDefault(require("./config/swagger"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 // Middleware
@@ -46,6 +49,8 @@ app.use('/api/timetables', timetables_routes_1.default);
 app.use('/api/proxy', proxy_routes_1.default);
 app.use('/api/reports', reports_routes_1.default);
 app.use('/api/dashboard', dashboard_routes_1.default);
+// Swagger Documentation Route
+app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'Proxi API is running' });
