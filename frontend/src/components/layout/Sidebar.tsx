@@ -78,16 +78,18 @@ const Sidebar: React.FC = () => {
                         end={item.path === '/dashboard'}
                         title={isCollapsed ? item.label : ''}
                         className={({ isActive }) =>
-                            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all whitespace-nowrap ${isActive
+                            `flex items-center ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'} rounded-lg transition-all whitespace-nowrap ${isActive
                                 ? 'bg-primary-50 text-primary-700 font-medium'
                                 : `${isDarkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-700 hover:bg-gray-50'}`
                             }`
                         }
                     >
                         <item.icon className="w-5 h-5 flex-shrink-0" />
-                        <span className={`transition-opacity duration-200 ${isCollapsed ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>
-                            {item.label}
-                        </span>
+                        {!isCollapsed && (
+                            <span className="transition-opacity duration-200 opacity-100">
+                                {item.label}
+                            </span>
+                        )}
                     </NavLink>
                 ))}
             </nav>

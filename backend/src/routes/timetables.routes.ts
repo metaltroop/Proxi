@@ -6,6 +6,217 @@ import { getTimetablePdf, getBulkTimetablePdf } from '../services/reportingClien
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Timetables
+ *   description: Timetable management and operations
+ */
+
+/**
+ * @swagger
+ * /timetables:
+ *   get:
+ *     summary: Get timetable by query params
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: classId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of timetable entries
+ *   post:
+ *     summary: Create a single timetable entry
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teacherId:
+ *                 type: string
+ *               classId:
+ *                 type: string
+ *               subjectId:
+ *                 type: string
+ *               periodId:
+ *                 type: string
+ *               dayOfWeek:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Timetable entry created
+ * 
+ * /timetables/{id}:
+ *   put:
+ *     summary: Update timetable entry
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teacherId:
+ *                 type: string
+ *               classId:
+ *                 type: string
+ *               subjectId:
+ *                 type: string
+ *               periodId:
+ *                 type: string
+ *               dayOfWeek:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Timetable entry updated
+ *   delete:
+ *     summary: Delete timetable entry
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Timetable entry deleted
+ * 
+ * /timetables/teacher/{teacherId}:
+ *   get:
+ *     summary: Get teacher timetable
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: teacherId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Teacher timetable
+ * 
+ * /timetables/class/{classId}:
+ *   get:
+ *     summary: Get class timetable
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: classId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Class timetable
+ * 
+ * /timetables/conflicts:
+ *   post:
+ *     summary: Check for conflicts
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teacherId:
+ *                 type: string
+ *               classId:
+ *                 type: string
+ *               day:
+ *                 type: string
+ *               periodId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: List of conflicts
+ * 
+ * /timetables/download-pdf:
+ *   get:
+ *     summary: Download timetable PDF
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: classId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: PDF file stream
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ * 
+ * /timetables/download-bulk-pdf:
+ *   post:
+ *     summary: Download bulk timetable PDF
+ *     tags: [Timetables]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               classIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               teacherIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: PDF file stream
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
 // Get timetable by query params (classId or teacherId)
 router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     try {

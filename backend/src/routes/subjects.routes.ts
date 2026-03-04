@@ -5,6 +5,114 @@ import { UserRole } from '@prisma/client';
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Subjects
+ *   description: Subject management and operations
+ */
+
+/**
+ * @swagger
+ * /subjects:
+ *   get:
+ *     summary: Get all subjects
+ *     tags: [Subjects]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of subjects
+ *   post:
+ *     summary: Create a new subject
+ *     tags: [Subjects]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - subjectName
+ *               - shortCode
+ *             properties:
+ *               subjectName:
+ *                 type: string
+ *               shortCode:
+ *                 type: string
+ *               colorCode:
+ *                 type: string
+ *               standardsApplicable:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       201:
+ *         description: Subject created successfully
+ * 
+ * /subjects/{id}:
+ *   get:
+ *     summary: Get a single subject
+ *     tags: [Subjects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Subject details
+ *   put:
+ *     summary: Update a subject
+ *     tags: [Subjects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               subjectName:
+ *                 type: string
+ *               shortCode:
+ *                 type: string
+ *               colorCode:
+ *                 type: string
+ *               standardsApplicable:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Subject updated successfully
+ *   delete:
+ *     summary: Delete a subject
+ *     tags: [Subjects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Subject deleted successfully
+ */
 // Get all subjects
 router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     try {

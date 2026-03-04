@@ -80,6 +80,7 @@ const Timetables: React.FC = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [timetableExists, setTimetableExists] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [bulkSubjectId, setBulkSubjectId] = useState('');
     const [bulkClassId, setBulkClassId] = useState('');
@@ -124,6 +125,20 @@ const Timetables: React.FC = () => {
             checkAndFetchTimetable();
         }
     }, [isLocked, selectedId, searchType]);
+
+    // Auto-select subject if only one is available when editing starts
+    useEffect(() => {
+        if (isLocked && isEditing) {
+            const currentSubjectOptions = getFilteredSubjects();
+            // If there's exactly one subject available, always select it
+            if (currentSubjectOptions.length === 1) {
+                setBulkSubjectId(currentSubjectOptions[0].id);
+            } else if (currentSubjectOptions.length > 1 && !currentSubjectOptions.find(s => s.id === bulkSubjectId)) {
+                // If the previously selected subject is no longer in the list, clear it
+                setBulkSubjectId('');
+            }
+        }
+    }, [isLocked, isEditing, selectedId, searchType, subjects, teachers, bulkClassId, bulkTeacherId]);
 
     const fetchData = async () => {
         try {
@@ -239,9 +254,12 @@ const Timetables: React.FC = () => {
         });
         setTempAssignments([...tempAssignments, ...newAssignments]);
         setSelectedCells(new Set());
-        setBulkSubjectId('');
-        setBulkClassId('');
-        setBulkTeacherId('');
+
+        // Only clear the subject if the teacher has multiple subjects.
+        // If they only have 1 subject, leave it selected.
+        if (getFilteredSubjects().length > 1) {
+            setBulkSubjectId('');
+        }
     };
 
     const handleSaveAll = async () => {
@@ -249,6 +267,8 @@ const Timetables: React.FC = () => {
             toast.error('No changes to save');
             return;
         }
+
+        setIsSaving(true);
         try {
             if (pendingDeletions.length > 0) {
                 await Promise.all(pendingDeletions.map(d => api.delete(`/timetables/${d.entryId}`)));
@@ -274,6 +294,8 @@ const Timetables: React.FC = () => {
         } catch (error: any) {
             console.error('Save error:', error);
             toast.error(error.response?.data?.error || 'Failed to save timetable');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -421,9 +443,9 @@ const Timetables: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className={`rounded-xl border ${isSearchExpanded ? 'mb-6' : 'mb-3'} transition-all duration-200 relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div
-                            className="p-4 flex items-center justify-between cursor-pointer"
+                            className={`flex items-center justify-between cursor-pointer ${!isSearchExpanded && selectedId ? 'px-4 py-3' : 'p-4'}`}
                             onClick={() => setIsSearchExpanded(!isSearchExpanded)}
                         >
                             <div className="flex items-center gap-2">
@@ -467,9 +489,9 @@ const Timetables: React.FC = () => {
                     </div>
 
                     {isLocked && isEditing && (
-                        <div className={`rounded-xl border mb-6 transition-all duration-200 relative z-50 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`rounded-xl border ${isBulkExpanded ? 'mb-6' : 'mb-3'} transition-all duration-200 relative z-50 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div
-                                className="p-4 flex items-center justify-between cursor-pointer "
+                                className={`flex items-center justify-between cursor-pointer ${!isBulkExpanded && selectedCells.size > 0 ? 'px-4 py-3' : 'p-4'}`}
                                 onClick={() => setIsBulkExpanded(!isBulkExpanded)}
                             >
                                 <div className="flex items-center gap-2">
@@ -485,27 +507,52 @@ const Timetables: React.FC = () => {
 
                             <div className={`transition-all duration-300 ease-ios ${isBulkExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 <div className="p-6 pt-0">
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <Dropdown options={subjectOptions} value={bulkSubjectId} onChange={setBulkSubjectId}
-                                            placeholder="Select Subject" label="Subject" required />
-                                        {searchType === 'teacher' && (
-                                            <Dropdown options={classOptions} value={bulkClassId} onChange={setBulkClassId}
-                                                placeholder="Select Class" label="Class" required />
-                                        )}
-                                        {searchType === 'class' && (
-                                            <Dropdown options={teacherOptions} value={bulkTeacherId} onChange={setBulkTeacherId}
-                                                placeholder="Select Teacher" label="Teacher" required />
-                                        )}
-                                        <div className="flex items-end">
-                                            <button onClick={handleAddAssignments} disabled={selectedCells.size === 0}
-                                                className="btn btn-primary w-full flex items-center justify-center gap-2">
-                                                <Plus className="w-5 h-5" />
-                                                Add ({selectedCells.size} cells)
-                                            </button>
+                                    <div className={`flex flex-col ${subjectOptions.length <= 3 ? 'md:flex-row md:items-end md:gap-6' : 'gap-4'} mb-4`}>
+                                        <div className={subjectOptions.length <= 3 ? 'flex-shrink-0' : 'mb-4'}>
+                                            <label className={`text-sm font-medium mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                Select Subject <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {subjectOptions.map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => setBulkSubjectId(option.id)}
+                                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${bulkSubjectId === option.id
+                                                            ? (isDarkMode ? 'bg-primary-600 border-primary-500 text-white' : 'bg-primary-100 border-primary-500 text-primary-800')
+                                                            : (isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50')
+                                                            }`}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                                {subjectOptions.length === 0 && (
+                                                    <span className={`text-sm italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>No subjects available</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className={`flex flex-col md:flex-row md:items-end gap-4 flex-1 w-full ${subjectOptions.length > 3 ? 'border-t pt-4 dark:border-gray-700' : ''}`}>
+                                            <div className="flex-1">
+                                                {searchType === 'teacher' && (
+                                                    <Dropdown options={classOptions} value={bulkClassId} onChange={setBulkClassId}
+                                                        placeholder="Select Class" label="Class" required />
+                                                )}
+                                                {searchType === 'class' && (
+                                                    <Dropdown options={teacherOptions} value={bulkTeacherId} onChange={setBulkTeacherId}
+                                                        placeholder="Select Teacher" label="Teacher" required />
+                                                )}
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <button onClick={handleAddAssignments} disabled={selectedCells.size === 0}
+                                                    className="btn btn-primary w-full md:w-auto px-6 h-[42px] flex items-center justify-center gap-2">
+                                                    <Plus className="w-5 h-5" />
+                                                    Add ({selectedCells.size} cells)
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     {selectedCells.size > 0 && (
-                                        <p className={`text-sm mt-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                             Click cells in the grid to select/deselect them for bulk assignment
                                         </p>
                                     )}
@@ -853,11 +900,11 @@ const Timetables: React.FC = () => {
                             </button>
                             <button
                                 onClick={handleSaveAll}
-                                disabled={tempAssignments.length === 0 && pendingDeletions.length === 0}
-                                className="px-4 py-2 rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-lg"
+                                disabled={isSaving || (tempAssignments.length === 0 && pendingDeletions.length === 0)}
+                                className={`px-4 py-2 rounded-md ${isSaving ? 'bg-primary-500' : 'bg-primary-600 hover:bg-primary-700'} text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-lg`}
                             >
-                                <Save className="w-5 h-5 inline mr-1" />
-                                Save All
+                                <Save className={`w-5 h-5 inline mr-1 ${isSaving ? 'animate-spin' : ''}`} />
+                                {isSaving ? 'Saving...' : 'Save All'}
                             </button>
                         </div>
                     </div>

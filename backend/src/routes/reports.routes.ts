@@ -5,6 +5,91 @@ import { getProxyReportPdf } from '../services/reportingClient';
 const router = Router();
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Reports
+ *   description: Reporting, analytics and PDFs
+ */
+
+/**
+ * @swagger
+ * /reports/proxies:
+ *   get:
+ *     summary: Get proxy assignments with filters
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of filtered proxies
+ * 
+ * /reports/stats:
+ *   get:
+ *     summary: Get summary statistics for proxies
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Statistics data
+ * 
+ * /reports/proxies/download-pdf:
+ *   get:
+ *     summary: Download proxy report as PDF
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: teacherId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: PDF file stream
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
 // GET /reports/proxies - Get proxy assignments with filters
 router.get('/proxies', async (req: Request, res: Response) => {
     try {

@@ -16,6 +16,9 @@ import timetableRoutes from './routes/timetables.routes';
 import proxyRoutes from './routes/proxy.routes';
 import reportRoutes from './routes/reports.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+// Import Swagger
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +49,9 @@ app.use('/api/timetables', timetableRoutes);
 app.use('/api/proxy', proxyRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+
+// Swagger Documentation Route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
 app.get('/health', (req, res) => {

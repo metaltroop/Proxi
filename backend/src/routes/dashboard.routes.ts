@@ -5,6 +5,25 @@ import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 const router = Router();
 import prisma from '../config/database';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Dashboard
+ *   description: Dashboard statistics and overviews
+ */
+
+/**
+ * @swagger
+ * /dashboard/stats:
+ *   get:
+ *     summary: Get comprehensive dashboard statistics
+ *     tags: [Dashboard]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contains teacher counts, absence rates, and proxy trends
+ */
 router.get('/stats', async (req: Request, res: Response) => {
     try {
         const today = new Date();

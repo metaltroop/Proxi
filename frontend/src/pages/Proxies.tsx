@@ -343,24 +343,26 @@ const Proxies: React.FC = () => {
                 </div>
 
                 {/* Teacher Search */}
-                <div className={`rounded-xl p-6 border relative z-20 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                            <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Today:</label>
-                            <div className={`text-lg font-semibold ${isDarkMode ? 'text-primary-400' : 'text-primary-600'}`}>
+                <div className={`rounded-xl p-4 border relative z-20 transition-all ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className={`flex flex-col gap-3 ${isLocked ? 'md:flex-row md:items-center md:gap-6' : ''}`}>
+                        <div className="flex items-center gap-3 shrink-0">
+                            <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Today</label>
+                            <div className={`text-base font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                                 {currentDayName}, {new Date(currentDate).toLocaleDateString()}
                             </div>
                         </div>
 
-                        <Autocomplete
-                            options={autocompleteOptions}
-                            value={selectedTeacherId}
-                            onChange={setSelectedTeacherId}
-                            onSearch={handleTeacherSearch}
-                            placeholder="Search for a teacher..."
-                            locked={isLocked}
-                            onUnlock={handleUnlock}
-                        />
+                        <div className={`flex-1 ${!isLocked ? 'w-full' : ''}`}>
+                            <Autocomplete
+                                options={autocompleteOptions}
+                                value={selectedTeacherId}
+                                onChange={setSelectedTeacherId}
+                                onSearch={handleTeacherSearch}
+                                placeholder="Search for a teacher..."
+                                locked={isLocked}
+                                onUnlock={handleUnlock}
+                            />
+                        </div>
 
                         {!isLocked && selectedTeacherId && (
                             <button
@@ -377,7 +379,7 @@ const Proxies: React.FC = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-24 md:pb-8">
+            <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-32 md:pb-36">
                 {/* Empty State - No Teacher Selected */}
                 {!isLocked && (
                     <div className={`rounded-xl p-12 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -561,11 +563,14 @@ const Proxies: React.FC = () => {
                                                         Assign Proxy Teacher:
                                                     </label>
                                                     <Autocomplete
-                                                        options={availableTeachers.map(t => ({
-                                                            id: t.id,
-                                                            label: t.name,
-                                                            sublabel: `${t.currentLoad} classes`
-                                                        }))}
+                                                        options={availableTeachers.map(t => {
+                                                            const temporaryLoad = tempAssignments.filter(a => a.proxyTeacherId === t.id).length;
+                                                            return {
+                                                                id: t.id,
+                                                                label: t.name,
+                                                                sublabel: `${t.currentLoad + temporaryLoad} classes`
+                                                            };
+                                                        }).sort((a, b) => parseInt(a.sublabel.split(' ')[0]) - parseInt(b.sublabel.split(' ')[0]))}
                                                         value=""
                                                         onChange={(teacherId: string) => handleProxySelect(entry.periodId, teacherId)}
                                                         onSearch={() => { }} // No search needed, already filtered
@@ -669,9 +674,15 @@ const Proxies: React.FC = () => {
                                                                                 className={`w-full px-3 py-2 text-sm rounded-lg shadow-sm border-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-primary-300 text-gray-900'}`}
                                                                             >
                                                                                 <option value="">Select teacher...</option>
-                                                                                {availableTeachers.map(teacher => (
+                                                                                {availableTeachers.map(teacher => {
+                                                                                    const temporaryLoad = tempAssignments.filter(a => a.proxyTeacherId === teacher.id).length;
+                                                                                    return {
+                                                                                        ...teacher,
+                                                                                        dynamicLoad: teacher.currentLoad + temporaryLoad
+                                                                                    };
+                                                                                }).sort((a, b) => a.dynamicLoad - b.dynamicLoad).map(teacher => (
                                                                                     <option key={teacher.id} value={teacher.id}>
-                                                                                        {teacher.name} ({teacher.currentLoad})
+                                                                                        {teacher.name} ({teacher.dynamicLoad})
                                                                                     </option>
                                                                                 ))}
                                                                             </select>
@@ -700,28 +711,30 @@ const Proxies: React.FC = () => {
 
                 {/* Save Button */}
                 {isLocked && tempAssignments.length > 0 && (
-                    <div className={`rounded-xl p-6 border-t-4 border-primary-500 shadow-2xl sticky bottom-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div>
-                                <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Proxy Assignments</h3>
-                                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    {tempAssignments.length} assignment{tempAssignments.length !== 1 ? 's' : ''} ready to save
-                                </p>
-                            </div>
-                            <div className="flex gap-3 w-full md:w-auto">
-                                <button
-                                    onClick={() => {
-                                        setTempAssignments([]);
-                                        setSelectedCells(new Set());
-                                    }}
-                                    className="btn btn-secondary flex-1 md:flex-none"
-                                >
-                                    Cancel
-                                </button>
-                                <button onClick={handleSaveAll} className="btn btn-primary flex items-center justify-center gap-2 flex-1 md:flex-none" disabled={saving}>
-                                    <Save className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
-                                    {saving ? 'Saving...' : `Save All (${tempAssignments.length})`}
-                                </button>
+                    <div className={`fixed bottom-0 left-0 right-0 z-50 p-4 transform transition-transform duration-300 ease-in-out md:left-64`}>
+                        <div className={`max-w-7xl mx-auto rounded-xl p-4 md:p-6 shadow-2xl border-t-4 border-primary-500 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="text-center md:text-left">
+                                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Proxy Assignments</h3>
+                                    <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {tempAssignments.length} assignment{tempAssignments.length !== 1 ? 's' : ''} ready to save
+                                    </p>
+                                </div>
+                                <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
+                                    <button
+                                        onClick={() => {
+                                            setTempAssignments([]);
+                                            setSelectedCells(new Set());
+                                        }}
+                                        className="btn btn-secondary flex-1 md:flex-none"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button onClick={handleSaveAll} className="btn btn-primary flex items-center justify-center gap-2 flex-1 md:flex-none" disabled={saving}>
+                                        <Save className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
+                                        {saving ? 'Saving...' : `Save All (${tempAssignments.length})`}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

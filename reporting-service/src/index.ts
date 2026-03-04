@@ -4,6 +4,9 @@ import reportsRoutes from './routes/reports.routes';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
@@ -14,6 +17,30 @@ app.use(express.json({ limit: '50mb' })); // Increase limit for large JSON paylo
 // Routes
 app.use('/reports', reportsRoutes);
 
+// Swagger Documentation Route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns the status of the reporting service
+ *     responses:
+ *       200:
+ *         description: Reporting service is up and running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                 service:
+ *                   type: string
+ *                   example: reporting-service
+ */
 // Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', service: 'reporting-service' });
